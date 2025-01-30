@@ -33,6 +33,18 @@ export function getPlayer(username: string, dontCreate:boolean): MexpUser|null {
     }
 }
 
+export function getAllPlayers(): MexpUser[] {
+    const stmt = db.prepareQuery("SELECT * FROM users");
+    const info = stmt.all();
+    stmt.finalize();
+
+    const players:MexpUser[] = [];
+    for (const row of info) {
+        players.push(MexpUser.fromRow(row));
+    }
+    return players;
+}
+
 function createPlayer(username: string) {
     const user = new MexpUser();
 

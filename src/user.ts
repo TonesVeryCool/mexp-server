@@ -1,6 +1,7 @@
 import { DB, Row } from "https://deno.land/x/sqlite@v3.9.1/mod.ts";
 import { db, getPlayer } from "./db.ts";
 import { now, shortenName } from "./utils.ts";
+import { lastMessageFrom } from "./speak.ts";
 
 export const sessions:MexpSession[] = [];
 
@@ -73,7 +74,7 @@ export enum GhostType {
 
 export class MexpGhost {
     name:string = "";
-    speak:string = "";
+    speak:string = "NO MESSAGE";
     scene:string = "map_welcome";
     position:MexpPosition = new MexpPosition;
     type:GhostType = GhostType.Classic;
@@ -89,6 +90,7 @@ export class MexpGhost {
         const lastPlayed = row[9] as number;
 
         ghost.name = name;
+        ghost.speak = lastMessageFrom(shortenName(name));
 
         if (name.startsWith("_"))
         {
@@ -100,6 +102,8 @@ export class MexpGhost {
             else if (banned) ghost.type = GhostType.Upgrade;
             else ghost.type = (now() - lastPlayed >= 15) ? GhostType.Inactive : GhostType.Classic;
         }
+
+        ghost.name = shortenName(ghost.name);
 
         return ghost;
     }

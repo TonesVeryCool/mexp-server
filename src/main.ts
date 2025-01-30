@@ -1,15 +1,11 @@
 import { encode, getRandomFilePath, isAuthorized, now, randf_range, shortenName, validateUsername } from "./utils.ts";
-import { db, getPlayer } from "./db.ts";
+import { db, getAllPlayers, getPlayer } from "./db.ts";
 import { config } from "./config.ts";
 import { sessions, MexpPosition, MexpSession, MexpUser, MexpGhost, GhostType } from "./user.ts";
+import { chatMessages, indexesToText, SpeakMessage } from "./speak.ts";
 
-function hasSession(me:string): boolean {
-  return sessions.some(session => session.username === me);
-}
-
-function getSession(me:string): MexpSession|null {
-  return sessions.find(session => session.username === me) ?? null;
-}
+const hasSession = (me:string): boolean => sessions.some(session => session.username === me);
+const getSession = (me:string): MexpSession|null => sessions.find(session => session.username === me) ?? null;
 
 if (import.meta.main) {
   Deno.serve({port: config.port}, async (req: Request) => {
@@ -82,7 +78,7 @@ if (import.meta.main) {
       }
       case "/m/u/t": {
         if (!user) return new Response("");
-        return new Response(user.legitTokens + " " + user.cheatTokens);
+        return new Response(`${user.legitTokens} ${user.cheatTokens}`);
       }
       case "/m/u/s": {
         if (!user) return new Response("");
@@ -124,18 +120,10 @@ if (import.meta.main) {
 
         const ghosts:MexpGhost[] = [];
 
-        // sorry
-        for (let i = 0; i < 250; i++) {
-          const funny:MexpGhost = new MexpGhost();
-          funny.name = `_editor${i}`;
-          funny.position.x = randf_range(-10, 10);
-          funny.position.y = randf_range(0, 10);
-          funny.position.z = randf_range(-10, 10);
-          funny.position.r = randf_range(-180, 180);
-          funny.type = GhostType.Authorized;
-          funny.speak = "fuck you";
-          funny.scene = "map_welcome";
-          ghosts.push(funny);
+        for (const player of getAllPlayers())
+        {
+          if (player.username == user.username) continue;
+          ghosts.push(player.ghost);
         }
 
         let final:string = "";
@@ -143,6 +131,8 @@ if (import.meta.main) {
         for (const ghost of ghosts) {
           final += `${ghost.str()}\n`;
         }
+
+        console.log(final);
 
         return new Response(final.trim());
       }
@@ -161,12 +151,60 @@ if (import.meta.main) {
         return new Response("1");
       }
       case "/m/o/p": {
-        return new Response("1");
+        if (!user) return new Response("");
+
+        return new Response(sessions.length.toString());
+      }
+      case "/m/m/s": {
+        if (!user) return new Response("");
+
+        let final:string = "";
+
+        for (const message of chatMessages) {
+          final += `${message.username}: ${message.message}\n`;
+        }
+
+        final = final.substring(0, final.length - 1);
+
+        return new Response(final);
       }
       case "/m/o/s": {
+        if (!user) return new Response("");
+
+        const message = req.headers.get("sp") ?? "";
+        const split = message.split(" ");
+
+        if (split.length == 0) return new Response("");
+
+        const final = await indexesToText(split);
+        console.log(final);
+
+        const chatMessage:SpeakMessage = new SpeakMessage();
+        chatMessage.username = shortenName(user.username);
+        chatMessage.message = final;
+
+        chatMessages.push(chatMessage);
+
+        if (chatMessages.length > 20) {
+          chatMessages.shift();
+        }
+
+        return new Response("1");
+      }
+      case "/m/o/t": {
+        if (!user) return new Response("");
+        const tk = req.headers.get("tk") ?? "cave";
+
+        // TODO: make it have the v35 security
+        user.legitTokens += ` ${tk}`;
+        user.legitTokens = user.legitTokens.trimStart();
+        user.commit();
+
         return new Response("1");
       }
       case "/m/m/i": {
+        if (!user) return new Response("");
+
         return new Response(await Deno.readFile(`./assets/images/${await getRandomFilePath("./assets/images/")}`), {
           status: 200,
           headers: {

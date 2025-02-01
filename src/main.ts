@@ -90,9 +90,13 @@ if (import.meta.main) {
         return new Response(await Deno.readTextFile("./assets/wordlist.txt"));
       }
       case "/m/m/m": {
-        if (!user) return new Response("");
+        if (!user || !session) return new Response("");
+
+        session.clearMapTimer();
+
         let map = req.headers.get("map") ?? "map_void";
         let spawnData = req.headers.get("sd") ?? "0 0.9 0 0";
+
         try {
           const tokens = user.legitTokens.split(" ");
           if (mapTokens[map] != '' && !tokens.includes(mapTokens[map]) && config.validateMaps)
@@ -110,7 +114,16 @@ if (import.meta.main) {
         }
 
         if (map == "map_hell") {
-          serverLog(`you deserve it, ${shortenName(me)}.`)
+          serverLog(`you deserve it, ${shortenName(me)}.`);
+          session.doMapTimer("map_welcome");
+        }
+
+        if (map == "map_void") {
+          session.doMapTimer("map_welcome");
+        }
+
+        if (map == "map_maze") {
+          session.doMapTimer("map_void");
         }
 
         user.ghost.scene = map;

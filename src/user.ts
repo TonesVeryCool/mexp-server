@@ -8,6 +8,7 @@ export const sessions:MexpSession[] = [];
 export class MexpSession {
     username:string = "_editor";
     inactivityTimer:number = 0;
+    mapChangeTimer:number = 0;
 
     constructor() {
         this.resetTimer();
@@ -23,8 +24,24 @@ export class MexpSession {
         }, 15000);
     }
 
+    public clearMapTimer() {
+        if (this.mapChangeTimer) clearTimeout(this.mapChangeTimer);
+    }
+    
+    public doMapTimer(finalMap:string) {
+        this.clearMapTimer();
+
+        this.mapChangeTimer = setTimeout(() => {
+            const user = this.getUser();
+            if (!user) return;
+            user.ghost.scene = finalMap;
+            user.commit();
+        }, 1000 * 60 * 10);
+    }
+
     destroy() {
         clearTimeout(this.inactivityTimer);
+        clearTimeout(this.mapChangeTimer);
     }
 
     public getUser(): MexpUser|null {

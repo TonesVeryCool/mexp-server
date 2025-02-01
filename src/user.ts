@@ -1,6 +1,6 @@
 import { DB, Row } from "https://deno.land/x/sqlite@v3.9.1/mod.ts";
 import { db, getPlayer } from "./db.ts";
-import { now, shortenName } from "./utils.ts";
+import { now, serverLog, shortenName } from "./utils.ts";
 import { lastMessageFrom } from "./speak.ts";
 
 export const sessions:MexpSession[] = [];
@@ -20,7 +20,7 @@ export class MexpSession {
         this.inactivityTimer = setTimeout(() => {
             const index = sessions.indexOf(this);
             if (index > -1) sessions.splice(index, 1);
-            console.log(`see you soon, ${shortenName(this.username)}.`);
+            serverLog(`see you soon, ${shortenName(this.username)}.`);
         }, 15000);
     }
 

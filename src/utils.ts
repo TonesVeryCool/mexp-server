@@ -1,4 +1,4 @@
-import { config } from "./config.ts";
+import { config, webhookConfig } from "./config.ts";
 
 const flip = (data: any) => Object.fromEntries(Object.entries(data).map(([key, value]) => [value, key]));
 
@@ -82,23 +82,37 @@ export const randf_range = (min:number, max:number) => Math.floor(Math.random() 
 
 export function validateUsername(username:string, authorized:boolean): boolean {
     if (authorized) return true;
-
+    
     if (username.length != 64) return false;
     if (!validity(username)) return false;
-
+    
     return true;
 }
 
 export function isAuthorized(req:Request): boolean {
     const ed:string = req.headers.get("ed") ?? "0";
     const au:string = req.headers.get("au") ?? "something";
-
+    
     if (ed == "1" && au == config.authorizerText) return true;
-
+    
     return false;
 }
 
 export function serverLog(log:string) {
     console.log(log);
-    // TODO: add webhook
+    
+    if (webhookConfig.url != "") {
+        const payload = {
+            content: log,
+            username: webhookConfig.name,
+        };
+        
+        const response = fetch(webhookConfig.url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+        });
+    }
 }

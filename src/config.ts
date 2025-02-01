@@ -12,7 +12,12 @@ export const config = {
         'cave', 'ballpit', 'station', 'station_disco', 'employee',
         'vip', 'theater', 'museum', 'museumexit', 'underground_part1',
         'underground_part2', 'corporation'
-    ]
+    ],
+}
+
+export const webhookConfig = {
+    'url': '', // leave empty to not use webhooks
+    'name': 'MineXplorer',
 }
 
 export const tokenMapping: Record<string, string> = {

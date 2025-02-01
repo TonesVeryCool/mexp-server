@@ -10,19 +10,19 @@ export const chatMessages:SpeakMessage[] = []
 export async function indexesToText(str:string[]) {
     let final:string = "";
     const wordList = await Deno.readTextFile("./assets/wordlist.txt");
-    console.log(wordList);
-    console.log(str.join(" "));
     const wordListSplit = wordList.split(" ");
 
+    let lastWord = "";
     for (const idxString of str) {
         try {
             const idxNumber = Number.parseInt(idxString);
 
             if (idxNumber >= wordListSplit.length || idxNumber < 0) {
                 final += "undefined ";
+                lastWord = "undefined";
             } else {
                 const word = wordListSplit[idxNumber];
-                if (word == "s" || word == "un" || word == "ing" || word == "ed")
+                if (word == "s" || word == "ing" || word == "ed" || word == "." || word == "," || word == ":" || word == "!" || word == "?" || word == "'s" || word == "'ll" || lastWord == "un")
                 {
                     final += `${word}`;
                 }
@@ -30,9 +30,11 @@ export async function indexesToText(str:string[]) {
                 {
                     final += ` ${word}`;
                 }
+                lastWord = word;
             }
-        } catch (err) {
+        } catch (_err) {
             final += " ";
+            lastWord = "";
         }
     }
 

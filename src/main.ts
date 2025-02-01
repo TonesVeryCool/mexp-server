@@ -1,8 +1,10 @@
-import { encode, getRandomFilePath, isAuthorized, now, randf_range, shortenName, validateUsername } from "./utils.ts";
+import { encode, getRandomFilePath, isAuthorized, now, randf_range, serverLog, shortenName, validateUsername } from "./utils.ts";
 import { db, getAllPlayers, getPlayer } from "./db.ts";
-import { config } from "./config.ts";
+import { config, mapTokens, tokenMapping } from "./config.ts";
 import { sessions, MexpPosition, MexpSession, MexpUser, MexpGhost, GhostType } from "./user.ts";
 import { chatMessages, indexesToText, SpeakMessage } from "./speak.ts";
+
+let isScreenOn:boolean = true;
 
 const hasSession = (me:string): boolean => sessions.some(session => session.username === me);
 const getSession = (me:string): MexpSession|null => sessions.find(session => session.username === me) ?? null;
@@ -15,8 +17,8 @@ if (import.meta.main) {
       path = path.substring(1);
     }
 
-    console.log("====================================================")
-    console.log(path);
+    // console.log("====================================================")
+    // console.log(path);
 
     const me:string = req.headers.get("me") ?? "";
 
@@ -27,7 +29,6 @@ if (import.meta.main) {
       session = getSession(me);
       if (!session) {
         console.log(`Session for user ${me} doesn't exist!`);
-        console.log(session);
         return new Response("");
       }
 
@@ -69,7 +70,7 @@ if (import.meta.main) {
           const session:MexpSession = new MexpSession();
           session.username = me;
 
-          console.log(`welcome, ${shortenName(me)}.`);
+          serverLog(`welcome, ${shortenName(me)}.`);
           
           sessions.push(session);
         }
@@ -93,6 +94,11 @@ if (import.meta.main) {
         let map = req.headers.get("map") ?? "map_void";
         let spawnData = req.headers.get("sd") ?? "0 0.9 0 0";
         try {
+          const tokens = user.legitTokens.split(" ");
+          if (mapTokens[map] != '' && !tokens.includes(mapTokens[map]) && config.validateMaps)
+          {
+            throw new Deno.errors.NotFound("Was the map found? I don't know, the user doesn't have access to it!");
+          }
           await Deno.lstat(`./assets/maps/${map}.assetBundle`)
         } catch (err) {
           if (!(err instanceof Deno.errors.NotFound)) {
@@ -103,11 +109,14 @@ if (import.meta.main) {
           spawnData = "0 0.9 0 0";
         }
 
+        if (map == "map_hell") {
+          serverLog(`you deserve it, ${shortenName(me)}.`)
+        }
+
         user.ghost.scene = map;
         user.ghost.position = MexpPosition.fromString(spawnData);
         user.commit();
 
-        console.log(`loading ${map}`);
         return new Response(await Deno.readFile(`./assets/maps/${map}.assetBundle`), {
           status: 200,
           headers: {
@@ -117,12 +126,14 @@ if (import.meta.main) {
       }
       case "/m/o/g": {
         if (!user) return new Response("");
+        const map = user.ghost.scene ?? "";
 
         const ghosts:MexpGhost[] = [];
 
         for (const player of getAllPlayers())
         {
           if (player.username == user.username) continue;
+          if (player.ghost.scene == map) continue;
           ghosts.push(player.ghost);
         }
 
@@ -131,8 +142,6 @@ if (import.meta.main) {
         for (const ghost of ghosts) {
           final += `${ghost.str()}\n`;
         }
-
-        console.log(final);
 
         return new Response(final.trim());
       }
@@ -154,6 +163,14 @@ if (import.meta.main) {
         if (!user) return new Response("");
 
         return new Response(sessions.length.toString());
+      }
+      case "/m/o/c": {
+        if (!user) return new Response("");
+
+        isScreenOn = !isScreenOn;
+        serverLog(`${shortenName(me)} turned the screen ${isScreenOn ? "on" : "off"}.`);
+
+        return new Response("1");
       }
       case "/m/m/s": {
         if (!user) return new Response("");
@@ -177,11 +194,11 @@ if (import.meta.main) {
         if (split.length == 0) return new Response("");
 
         const final = await indexesToText(split);
-        console.log(final);
 
         const chatMessage:SpeakMessage = new SpeakMessage();
         chatMessage.username = shortenName(user.username);
         chatMessage.message = final;
+        serverLog(`\`${chatMessage.username}: ${chatMessage.message}\``);
 
         chatMessages.push(chatMessage);
 
@@ -194,11 +211,30 @@ if (import.meta.main) {
       case "/m/o/t": {
         if (!user) return new Response("");
         const tk = req.headers.get("tk") ?? "cave";
+        const map = user.ghost.scene;
 
-        // TODO: make it have the v35 security
-        user.legitTokens += ` ${tk}`;
-        user.legitTokens = user.legitTokens.trimStart();
-        user.commit();
+        if (!config.allTokens.includes(tk)) {
+          return new Response("1");
+        }
+
+        try {
+          if (tokenMapping[tk] != map && config.validateTokens) {
+            user.cheatTokens += ` ${tk}`;
+            user.cheatTokens = user.cheatTokens.trimStart();
+            user.commit();
+          } else {
+            const cheatedTokens = user.cheatTokens.split(" ");
+
+            if (cheatedTokens.includes(tk)) return new Response("1");
+
+            serverLog(`${shortenName(me)} got a token: \`${tk}\``);
+            user.legitTokens += ` ${tk}`;
+            user.legitTokens = user.legitTokens.trimStart();
+            user.commit();
+          }
+        } catch (_err) {
+          // TODO: what is meant to happen if an error occurs?
+        }
 
         return new Response("1");
       }
@@ -209,6 +245,17 @@ if (import.meta.main) {
           status: 200,
           headers: {
             "content-type": "image/png; charset=binary",
+          },
+        })
+      }
+      case "/m/m/t": {
+        if (!user) return new Response("");
+        if (!isScreenOn) return new Response("");
+
+        return new Response(await Deno.readFile(`./assets/videos/${await getRandomFilePath("./assets/videos/")}`), {
+          status: 200,
+          headers: {
+            "content-type": "video/mp4; charset=binary",
           },
         })
       }

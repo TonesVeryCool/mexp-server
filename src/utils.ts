@@ -97,3 +97,8 @@ export function isAuthorized(req:Request): boolean {
 
     return false;
 }
+
+export function serverLog(log:string) {
+    console.log(log);
+    // TODO: add webhook
+}

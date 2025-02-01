@@ -1,5 +1,5 @@
 import { encode, getRandomFilePath, isAuthorized, now, randf_range, serverLog, shortenName, validateUsername } from "./utils.ts";
-import { db, getAllPlayers, getPlayer } from "./db.ts";
+import { db, getAllPlayers, getPlayer, getPlayerByShortName } from "./db.ts";
 import { config, mapTokens, tokenMapping } from "./config.ts";
 import { sessions, MexpPosition, MexpSession, MexpUser, MexpGhost, GhostType } from "./user.ts";
 import { chatMessages, indexesToText, SpeakMessage } from "./speak.ts";
@@ -16,9 +16,6 @@ if (import.meta.main) {
     if (path.startsWith("//")) {
       path = path.substring(1);
     }
-
-    // console.log("====================================================")
-    // console.log(path);
 
     const me:string = req.headers.get("me") ?? "";
 
@@ -163,6 +160,24 @@ if (import.meta.main) {
 
         return new Response(await Deno.readTextFile("./assets/announcement.txt"));
       }
+      case "/m/n/n": {
+        if (!user) return new Response("");
+
+        return new Response(await Deno.readTextFile("./assets/news.txt"));
+      }
+      case "/m/u/p": {
+        if (!user) return new Response("");
+        const target = req.headers.get("pr") ?? shortenName(me);
+        const targetUser = getPlayerByShortName(target);
+        if (!targetUser) return new Response("");
+
+        const speakMsg = targetUser.ghost.speak.replace("@", " ").trim();
+        const finalMsg = speakMsg == "" ? `` : `'${speakMsg}'`;
+
+        const lastOnline = now() - targetUser.lastPlayed;
+
+        return new Response(`${target}\n${finalMsg}\n${lastOnline} seconds ago\n${targetUser.legitTokens.split(" ").join(", ")}`);
+      }
       case "/m/u/g": {
         if (!user) return new Response("");
 
@@ -274,6 +289,8 @@ if (import.meta.main) {
       }
     }
 
+    console.log("====================================================")
+    console.log(path);
     return new Response("404");
   })
 }

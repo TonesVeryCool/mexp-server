@@ -45,6 +45,19 @@ export function getAllPlayers(): MexpUser[] {
     return players;
 }
 
+export function getPlayerByShortName(me:string): MexpUser|null {
+    try {
+        const me2 = me + "%";
+        const stmt = db.prepareQuery("SELECT * FROM users WHERE username LIKE ?");
+        const info = stmt.one([me2]);
+        stmt.finalize();
+
+        return MexpUser.fromRow(info);
+    } catch (_err) {
+        return null;
+    }
+}
+
 function createPlayer(username: string) {
     const user = new MexpUser();
 

@@ -16,6 +16,13 @@ export const config = {
     ],
 }
 
+// if using a reverse proxy that has https, this is useless
+// only use this if you **want** it to only be accessible with http
+export const httpsConfig = {
+    "fullchain": "", // path to fullchain.pem
+    "privkey": "", // path to privkey.pem
+}
+
 export const webhookConfig = {
     'url': '', // leave empty to not use webhooks
     'name': 'MineXplorer',

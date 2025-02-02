@@ -1,6 +1,6 @@
 import { encode, getRandomFilePath, isAuthorized, now, randf_range, randomLetters, randomString, serverLog, shortenName, validateUsername } from "./utils.ts";
 import { db, getAllPlayers, getPlayer, getPlayerByShortName } from "./db.ts";
-import { config, mapTokens, tokenMapping } from "./config.ts";
+import { config, httpsConfig, mapTokens, tokenMapping } from "./config.ts";
 import { sessions, MexpPosition, MexpSession, MexpUser, MexpGhost, GhostType } from "./user.ts";
 import { chatMessages, indexesToText, SpeakMessage } from "./speak.ts";
 import { Captcha, captchas } from "./captcha.ts";
@@ -11,37 +11,42 @@ const hasSession = (me:string): boolean => sessions.some(session => session.user
 const getSession = (me:string): MexpSession|null => sessions.find(session => session.username === me) ?? null;
 
 if (import.meta.main) {
-  Deno.serve({port: config.port}, async (req: Request) => {
+  const settings =
+  (httpsConfig.fullchain != undefined && httpsConfig.privkey != undefined) ?
+  {port: config.port, cert: await Deno.readTextFile(httpsConfig.fullchain), key: await Deno.readTextFile(httpsConfig.privkey)} : 
+  {port: config.port};
+
+  Deno.serve(settings, async (req: Request) => {
     const url = new URL(req.url);
     let path = url.pathname;
     if (path.startsWith("//")) {
       path = path.substring(1);
     }
-
+    
     const me:string = req.headers.get("me") ?? "";
-
+    
     let session:MexpSession|null = null;
     let user:MexpUser|null = null;
     let au:boolean = false;
-
+    
     if (me != "" && path != "/m/u/v" && !(config.version >= 36 && me == "none" && (path == "/m/m/c" || path == "/m/u/c"))) {
       session = getSession(me);
       if (!session) {
         console.log(`Session for user ${me} doesn't exist!`);
         return new Response("");
       }
-
+      
       user = session.getUser();
       if (!user) {
         console.log(`User for session ${me} doesn't exist!`);
         return new Response("");
       }
-
+      
       session.resetTimer();
-
+      
       au = isAuthorized(req);
     }
-
+    
     switch (path)
     {
       case "/anymozu5/me/main/host": {
@@ -61,7 +66,7 @@ if (import.meta.main) {
         if (config.version >= 36) {
           const captcha = new Captcha();
           captchas.push(captcha);
-
+          
           return new Response(captcha.generateImage(), {
             status: 200,
             headers: {
@@ -78,12 +83,12 @@ if (import.meta.main) {
           for (const captcha of captchas) {
             if (captcha.answer == ca) {
               const newMe = randomLetters(64);
-
+              
               const player:MexpUser|null = getPlayer(newMe, false);
               if (!player) {
                 return new Response("");
               }
-
+              
               return new Response(newMe);
             } else {
               return new Response("");
@@ -99,25 +104,25 @@ if (import.meta.main) {
         if (!validateUsername(me, au)) {
           return new Response("0");
         }
-
+        
         if (vs != config.version.toString()) {
           return new Response("");
         }
-
+        
         const player:MexpUser|null = getPlayer(me, config.version >= 36);
         if (!player) return new Response("");
         player.lastPlayed = now();
         player.commit();
-
+        
         if (!hasSession(me)) {
           const session:MexpSession = new MexpSession();
           session.username = me;
-
+          
           serverLog(`welcome, ${shortenName(me)}.`);
           
           sessions.push(session);
         }
-
+        
         return new Response("1");
       }
       case "/m/u/t": {
@@ -134,16 +139,16 @@ if (import.meta.main) {
       }
       case "/m/m/m": {
         if (!user || !session) return new Response("");
-
+        
         session.clearMapTimer();
-
+        
         let map = req.headers.get("map") ?? "map_void";
         let spawnData = req.headers.get("sd") ?? "0 0.9 0 0";
-
+        
         try {
           const tokens = user.legitTokens.split(" ");
           if (mapTokens[map] != '' && !tokens.includes(mapTokens[map]) && config.validateMaps)
-          {
+            {
             throw new Deno.errors.NotFound("Was the map found? I don't know, the user doesn't have access to it!");
           }
           await Deno.lstat(`./assets/maps/${map}.assetBundle`)
@@ -151,28 +156,28 @@ if (import.meta.main) {
           if (!(err instanceof Deno.errors.NotFound)) {
             throw err;
           }
-
+          
           map = "map_void";
           spawnData = "0 0.9 0 0";
         }
-
+        
         if (map == "map_hell") {
           serverLog(`you deserve it, ${shortenName(me)}.`);
           session.doMapTimer("map_welcome");
         }
-
+        
         if (map == "map_void") {
           session.doMapTimer("map_welcome");
         }
-
+        
         if (map == "map_maze") {
           session.doMapTimer("map_void");
         }
-
+        
         user.ghost.scene = map;
         user.ghost.position = MexpPosition.fromString(spawnData);
         user.commit();
-
+        
         return new Response(await Deno.readFile(`./assets/maps/${map}.assetBundle`), {
           status: 200,
           headers: {
@@ -183,32 +188,32 @@ if (import.meta.main) {
       case "/m/o/g": {
         if (!user) return new Response("");
         const map = user.ghost.scene ?? "";
-
+        
         const ghosts:MexpGhost[] = [];
-
+        
         for (const player of getAllPlayers())
-        {
+          {
           if (player.username == user.username) continue;
           if (player.ghost.scene == map) continue;
           ghosts.push(player.ghost);
         }
-
+        
         let final:string = "";
-
+        
         for (const ghost of ghosts) {
           final += `${ghost.str()}\n`;
         }
-
+        
         return new Response(final.trim());
       }
       case "/m/n/a": {
         if (!user) return new Response("");
-
+        
         return new Response(await Deno.readTextFile("./assets/announcement.txt"));
       }
       case "/m/n/n": {
         if (!user) return new Response("");
-
+        
         return new Response(await Deno.readTextFile("./assets/news.txt"));
       }
       case "/m/u/p": {
@@ -216,81 +221,81 @@ if (import.meta.main) {
         const target = req.headers.get("pr") ?? shortenName(me);
         const targetUser = getPlayerByShortName(target);
         if (!targetUser) return new Response("");
-
+        
         const speakMsg = targetUser.ghost.speak.replace("@", " ").trim();
         const finalMsg = speakMsg == "" ? `` : `'${speakMsg}'`;
-
+        
         const lastOnline = now() - targetUser.lastPlayed;
-
+        
         return new Response(`${target}\n${finalMsg}\n${lastOnline} seconds ago\n${targetUser.legitTokens.split(" ").join(", ")}`);
       }
       case "/m/u/g": {
         if (!user) return new Response("");
-
+        
         const spawnData = req.headers.get("gh");
         if (spawnData) user.ghost.position = MexpPosition.fromString(spawnData);
         user.commit();
-
+        
         return new Response("1");
       }
       case "/m/o/p": {
         if (!user) return new Response("");
-
+        
         return new Response(sessions.length.toString());
       }
       case "/m/o/c": {
         if (!user) return new Response("");
-
+        
         isScreenOn = !isScreenOn;
         serverLog(`${shortenName(me)} turned the screen ${isScreenOn ? "on" : "off"}.`);
-
+        
         return new Response("1");
       }
       case "/m/m/s": {
         if (!user) return new Response("");
-
+        
         let final:string = "";
-
+        
         for (const message of chatMessages) {
           final += `${message.username}: ${message.message}\n`;
         }
-
+        
         final = final.substring(0, final.length - 1);
-
+        
         return new Response(final);
       }
       case "/m/o/s": {
         if (!user) return new Response("");
-
+        
         const message = req.headers.get("sp") ?? "";
         const split = message.split(" ");
-
+        
         if (split.length == 0) return new Response("");
-
+        
         const final = await indexesToText(split);
-
+        
         const chatMessage:SpeakMessage = new SpeakMessage();
         chatMessage.username = shortenName(user.username);
         chatMessage.message = final;
         serverLog(`\`${chatMessage.username}: ${chatMessage.message}\``);
-
+        
         chatMessages.push(chatMessage);
-
+        
         if (chatMessages.length > 20) {
           chatMessages.shift();
         }
-
+        
         return new Response("1");
       }
       case "/m/o/t": {
         if (!user) return new Response("");
         const tk = req.headers.get("tk") ?? "cave";
         const map = user.ghost.scene;
-
+        
         if (!config.allTokens.includes(tk)) {
           return new Response("1");
         }
-
+        
         try {
           if (tokenMapping[tk] != map && config.validateTokens) {
             user.cheatTokens += ` ${tk}`;
@@ -298,9 +303,9 @@ if (import.meta.main) {
             user.commit();
           } else {
             const cheatedTokens = user.cheatTokens.split(" ");
-
+            
             if (cheatedTokens.includes(tk)) return new Response("1");
-
+            
             serverLog(`${shortenName(me)} got a token: \`${tk}\``);
             user.legitTokens += ` ${tk}`;
             user.legitTokens = user.legitTokens.trimStart();
@@ -309,12 +314,12 @@ if (import.meta.main) {
         } catch (_err) {
           // TODO: what is meant to happen if an error occurs?
         }
-
+        
         return new Response("1");
       }
       case "/m/m/i": {
         if (!user) return new Response("");
-
+        
         return new Response(await Deno.readFile(`./assets/images/${await getRandomFilePath("./assets/images/")}`), {
           status: 200,
           headers: {
@@ -325,7 +330,7 @@ if (import.meta.main) {
       case "/m/m/t": {
         if (!user) return new Response("");
         if (!isScreenOn) return new Response("");
-
+        
         return new Response(await Deno.readFile(`./assets/videos/${await getRandomFilePath("./assets/videos/")}`), {
           status: 200,
           headers: {
@@ -334,7 +339,7 @@ if (import.meta.main) {
         })
       }
     }
-
+    
     console.log("====================================================")
     console.log(path);
     return new Response("404");

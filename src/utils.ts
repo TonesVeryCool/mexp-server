@@ -101,13 +101,13 @@ export function isAuthorized(req:Request): boolean {
 export function serverLog(log:string) {
     console.log(log);
     
-    if (webhookConfig.url != "") {
+    if (webhookConfig.url != undefined && webhookConfig.url != "") {
         const payload = {
             content: log,
             username: webhookConfig.name,
         };
         
-        const response = fetch(webhookConfig.url, {
+        fetch(webhookConfig.url, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

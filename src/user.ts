@@ -10,6 +10,8 @@ export class MexpSession {
     inactivityTimer:number = 0;
     mapChangeTimer:number = 0;
 
+    legitBallpitAlt:boolean = false;
+
     constructor() {
         this.resetTimer();
     }

@@ -14,13 +14,14 @@ export const config = {
         'vip', 'theater', 'museum', 'museumexit', 'underground_part1',
         'underground_part2', 'corporation'
     ],
+    'ballpitAltChance': 2 // percentage
 }
 
 // if using a reverse proxy that has https, this is useless
 // only use this if you **want** it to only be accessible with http
 export const httpsConfig = {
-    "fullchain": "", // path to fullchain.pem
-    "privkey": "", // path to privkey.pem
+    'fullchain': '', // path to fullchain.pem
+    'privkey': '', // path to privkey.pem
 }
 
 export const webhookConfig = {

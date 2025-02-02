@@ -101,7 +101,7 @@ export function isAuthorized(req:Request): boolean {
 export function serverLog(log:string) {
     console.log(log);
     
-    if (webhookConfig.url != undefined && webhookConfig.url != "") {
+    if (webhookConfig.url) {
         const payload = {
             content: log,
             username: webhookConfig.name,

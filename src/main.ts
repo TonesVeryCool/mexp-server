@@ -11,8 +11,8 @@ const hasSession = (me:string): boolean => sessions.some(session => session.user
 const getSession = (me:string): MexpSession|null => sessions.find(session => session.username === me) ?? null;
 
 if (import.meta.main) {
-  const settings =
-  (httpsConfig.fullchain != undefined && httpsConfig.privkey != undefined) ?
+  const usesHttps = (httpsConfig.fullchain && httpsConfig.privkey);
+  const settings = usesHttps ?
   {port: config.port, cert: await Deno.readTextFile(httpsConfig.fullchain), key: await Deno.readTextFile(httpsConfig.privkey)} : 
   {port: config.port};
 
@@ -140,6 +140,7 @@ if (import.meta.main) {
       case "/m/m/m": {
         if (!user || !session) return new Response("");
         
+        session.legitBallpitAlt = false;
         session.clearMapTimer();
         
         let map = req.headers.get("map") ?? "map_void";
@@ -147,8 +148,7 @@ if (import.meta.main) {
         
         try {
           const tokens = user.legitTokens.split(" ");
-          if (mapTokens[map] != '' && !tokens.includes(mapTokens[map]) && config.validateMaps)
-            {
+          if (mapTokens[map] != '' && !tokens.includes(mapTokens[map]) && config.validateMaps) {
             throw new Deno.errors.NotFound("Was the map found? I don't know, the user doesn't have access to it!");
           }
           await Deno.lstat(`./assets/maps/${map}.assetBundle`)
@@ -159,6 +159,11 @@ if (import.meta.main) {
           
           map = "map_void";
           spawnData = "0 0.9 0 0";
+        }
+
+        if (map == "map_ballpit_cave" && randf_range(0.0, 100.0) >= (100 - (config.ballpitAltChance ?? 2))) {
+          session.legitBallpitAlt = true;
+          map = "map_ballpit_alt";
         }
         
         if (map == "map_hell") {
@@ -289,6 +294,8 @@ if (import.meta.main) {
       }
       case "/m/o/t": {
         if (!user) return new Response("");
+        if (!session) return new Response("");
+
         const tk = req.headers.get("tk") ?? "cave";
         const map = user.ghost.scene;
         
@@ -297,7 +304,7 @@ if (import.meta.main) {
         }
         
         try {
-          if (tokenMapping[tk] != map && config.validateTokens) {
+          if ((tokenMapping[tk] != map || (tk == "undeground_part2" && !session.legitBallpitAlt)) && config.validateTokens) {
             user.cheatTokens += ` ${tk}`;
             user.cheatTokens = user.cheatTokens.trimStart();
             user.commit();

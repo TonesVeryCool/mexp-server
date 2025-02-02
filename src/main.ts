@@ -86,15 +86,15 @@ if (import.meta.main) {
               
               const player:MexpUser|null = getPlayer(newMe, false);
               if (!player) {
-                return new Response("");
+                return new Response("0");
               }
               
               return new Response(newMe);
             } else {
-              return new Response("");
+              return new Response("0");
             }
           }
-          return new Response("");
+          return new Response("0");
         } else {
           return new Response("404");
         }

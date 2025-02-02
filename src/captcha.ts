@@ -28,7 +28,6 @@ export class Captcha {
     }
 
     public generateImage() {
-        console.log(this.answer);
         const canvas = createCanvas(200, 100);
         const ctx = canvas.getContext("2d");
 

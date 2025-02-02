@@ -1,4 +1,4 @@
-import { encode, getRandomFilePath, isAuthorized, now, randf_range, randomString, serverLog, shortenName, validateUsername } from "./utils.ts";
+import { encode, getRandomFilePath, isAuthorized, now, randf_range, randomLetters, randomString, serverLog, shortenName, validateUsername } from "./utils.ts";
 import { db, getAllPlayers, getPlayer, getPlayerByShortName } from "./db.ts";
 import { config, mapTokens, tokenMapping } from "./config.ts";
 import { sessions, MexpPosition, MexpSession, MexpUser, MexpGhost, GhostType } from "./user.ts";
@@ -24,7 +24,7 @@ if (import.meta.main) {
     let user:MexpUser|null = null;
     let au:boolean = false;
 
-    if (me != "" && path != "/m/u/v" && !(config.version > 36 && me == "none" && (path == "/m/m/c" || path == "/m/u/c"))) {
+    if (me != "" && path != "/m/u/v" && !(config.version >= 36 && me == "none" && (path == "/m/m/c" || path == "/m/u/c"))) {
       session = getSession(me);
       if (!session) {
         console.log(`Session for user ${me} doesn't exist!`);
@@ -77,7 +77,14 @@ if (import.meta.main) {
           const ca = req.headers.get("ca") ?? "wrong";
           for (const captcha of captchas) {
             if (captcha.answer == ca) {
-              return new Response(randomString(64));
+              const newMe = randomLetters(64);
+
+              const player:MexpUser|null = getPlayer(newMe, false);
+              if (!player) {
+                return new Response("");
+              }
+
+              return new Response(newMe);
             } else {
               return new Response("");
             }
@@ -94,11 +101,11 @@ if (import.meta.main) {
         }
 
         if (vs != config.version.toString()) {
-          return new Response("0");
+          return new Response("");
         }
 
-        const player:MexpUser|null = getPlayer(me, false);
-        if (!player) return new Response("0");
+        const player:MexpUser|null = getPlayer(me, config.version >= 36);
+        if (!player) return new Response("");
         player.lastPlayed = now();
         player.commit();
 

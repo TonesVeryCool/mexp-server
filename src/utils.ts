@@ -121,3 +121,8 @@ export const randomString = (size:number): string => {
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     return Array.from({length: size}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 }
+
+export const randomLetters = (size:number): string => {
+    const chars = 'abcdefghijklmnopqrstuvwxyz';
+    return Array.from({length: size}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+}

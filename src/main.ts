@@ -1,8 +1,9 @@
-import { encode, getRandomFilePath, isAuthorized, now, randf_range, serverLog, shortenName, validateUsername } from "./utils.ts";
+import { encode, getRandomFilePath, isAuthorized, now, randf_range, randomString, serverLog, shortenName, validateUsername } from "./utils.ts";
 import { db, getAllPlayers, getPlayer, getPlayerByShortName } from "./db.ts";
 import { config, mapTokens, tokenMapping } from "./config.ts";
 import { sessions, MexpPosition, MexpSession, MexpUser, MexpGhost, GhostType } from "./user.ts";
 import { chatMessages, indexesToText, SpeakMessage } from "./speak.ts";
+import { Captcha, captchas } from "./captcha.ts";
 
 let isScreenOn:boolean = true;
 
@@ -21,8 +22,9 @@ if (import.meta.main) {
 
     let session:MexpSession|null = null;
     let user:MexpUser|null = null;
+    let au:boolean = false;
 
-    if (me != "" && path != "/m/u/v") {
+    if (me != "" && path != "/m/u/v" && !(config.version > 36 && me == "none" && (path == "/m/m/c" || path == "/m/u/c"))) {
       session = getSession(me);
       if (!session) {
         console.log(`Session for user ${me} doesn't exist!`);
@@ -36,25 +38,62 @@ if (import.meta.main) {
       }
 
       session.resetTimer();
+
+      au = isAuthorized(req);
     }
 
     switch (path)
     {
       case "/anymozu5/me/main/host": {
-        return new Response(encode(`http://${config.ip}:${config.port}/`));
+        const port = config.port == 80 || config.port == 443 ? '': `:${config.port}`;
+        return new Response(encode(`${config.scheme}://${config.ip}${port}/`));
       }
       case `/${config.data}/allowed`: {
         return new Response(config.allowed ? "1" : "0");
       }
       case `/${config.data}/version`: {
-        return new Response(config.version);
+        return new Response(config.version.toString());
       }
       case "/m/m/d": {
         return new Response(config.data);
       }
+      case "/m/m/c": {
+        if (config.version >= 36) {
+          const captcha = new Captcha();
+          captchas.push(captcha);
+
+          return new Response(captcha.generateImage(), {
+            status: 200,
+            headers: {
+              "content-type": "image/png; charset=binary",
+            },
+          });
+        } else {
+          return new Response("404");
+        }
+      }
+      case "/m/u/c": {
+        if (config.version >= 36) {
+          const ca = req.headers.get("ca") ?? "wrong";
+          for (const captcha of captchas) {
+            if (captcha.answer == ca) {
+              return new Response(randomString(64));
+            } else {
+              return new Response("");
+            }
+          }
+          return new Response("");
+        } else {
+          return new Response("404");
+        }
+      }
       case "/m/u/v": {
-        const au:boolean = isAuthorized(req);
+        const vs = req.headers.get("vs") ?? "0";
         if (!validateUsername(me, au)) {
+          return new Response("0");
+        }
+
+        if (vs != config.version.toString()) {
           return new Response("0");
         }
 

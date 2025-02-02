@@ -1,5 +1,13 @@
 {
   "version": "4",
+  "specifiers": {
+    "jsr:@std/encoding@1.0.5": "1.0.5"
+  },
+  "jsr": {
+    "@std/encoding@1.0.5": {
+      "integrity": "ecf363d4fc25bd85bd915ff6733a7e79b67e0e7806334af15f4645c569fefc04"
+    }
+  },
   "remote": {
     "https://deno.land/x/sqlite@v3.9.1/build/sqlite.js": "2afc7875c7b9c85d89730c4a311ab3a304e5d1bf761fbadd8c07bbdf130f5f9b",
     "https://deno.land/x/sqlite@v3.9.1/build/vfs.js": "7f7778a9fe499cd10738d6e43867340b50b67d3e39142b0065acd51a84cd2e03",
@@ -10,6 +18,15 @@
     "https://deno.land/x/sqlite@v3.9.1/src/function.ts": "bc778cab7a6d771f690afa27264c524d22fcb96f1bb61959ade7922c15a4ab8d",
     "https://deno.land/x/sqlite@v3.9.1/src/query.ts": "d58abda928f6582d77bad685ecf551b1be8a15e8e38403e293ec38522e030cad",
     "https://deno.land/x/sqlite@v3.9.1/src/wasm.ts": "e79d0baa6e42423257fb3c7cc98091c54399254867e0f34a09b5bdef37bd9487",
+    "https://raw.githubusercontent.com/DjDeveloperr/deno-canvas/master/deps.ts": "16c5b53ffab6387238c9f1e93a06b33495805fdf5a205ec295b237327b09abe7",
+    "https://raw.githubusercontent.com/DjDeveloperr/deno-canvas/master/mod.ts": "716e2dbc59957bf81c3ef8126f1a9ec8c55e83d775c668dcdf1278d6102610e6",
+    "https://raw.githubusercontent.com/DjDeveloperr/deno-canvas/master/src/base64.ts": "0928031fdba0c43b617154fbe2eb7578366460c04da1422933ae5e936d3d0349",
+    "https://raw.githubusercontent.com/DjDeveloperr/deno-canvas/master/src/canvas.ts": "288ff8b4a79577aaae3030b9989da17de7df429c8b9173495f5897d716f59629",
+    "https://raw.githubusercontent.com/DjDeveloperr/deno-canvas/master/src/canvaskit.ts": "c3d807472cbb3e1d9fc01bb43ff974ef796c4b010178d1595be5fa793cce5e7d",
+    "https://raw.githubusercontent.com/DjDeveloperr/deno-canvas/master/src/color_util.ts": "28f1072f0a5acbe7add7fac2f452311a47b44c080806fc4057de2d2e405c6c1c",
+    "https://raw.githubusercontent.com/DjDeveloperr/deno-canvas/master/src/lib.js": "55c4064064870313439dd7ef5297374cb0cbed2dc815bd064c3ace6e067753b0",
+    "https://raw.githubusercontent.com/DjDeveloperr/deno-canvas/master/src/types.ts": "67d5800f8f4b0a407e0251676a03ae91b5f50a3ed53e6b72dc5984113cb93128",
+    "https://raw.githubusercontent.com/DjDeveloperr/deno-canvas/master/src/wasm.js": "449d72cc14fc4142a5853f944df49a744d852981d09c5515528ede8aebb0afda",
     "https://raw.githubusercontent.com/dyedgreen/deno-sqlite/refs/heads/master/build/sqlite.js": "2afc7875c7b9c85d89730c4a311ab3a304e5d1bf761fbadd8c07bbdf130f5f9b",
     "https://raw.githubusercontent.com/dyedgreen/deno-sqlite/refs/heads/master/build/vfs.js": "7f7778a9fe499cd10738d6e43867340b50b67d3e39142b0065acd51a84cd2e03",
     "https://raw.githubusercontent.com/dyedgreen/deno-sqlite/refs/heads/master/mod.ts": "e09fc79d8065fe222578114b109b1fd60077bff1bb75448532077f784f4d6a83",

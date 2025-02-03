@@ -1,4 +1,4 @@
-import { encode, getRandomFilePath, isAuthorized, now, randf_range, randomLetters, randomString, serverLog, shortenName, validateUsername } from "./utils.ts";
+import { encode, getRandomFilePath, isAuthorized, now, randf_range, randomLetters, randomString, serverLog, shortenName, timeSinceLastOnline, validateUsername } from "./utils.ts";
 import { db, getAllPlayers, getPlayer, getPlayerByShortName } from "./db.ts";
 import { config, httpsConfig, mapTokens, tokenMapping } from "./config.ts";
 import { sessions, MexpPosition, MexpSession, MexpUser, MexpGhost, GhostType } from "./user.ts";
@@ -240,8 +240,8 @@ if (import.meta.main) {
         const finalMsg = speakMsg == "" ? `` : `'${speakMsg}'`;
         
         const lastOnline = now() - targetUser.lastPlayed;
-        
-        return new Response(`${target}\n${finalMsg}\n${lastOnline} seconds ago\n${targetUser.legitTokens.split(" ").join(", ")}`);
+
+        return new Response(`${target}\n${finalMsg}\n${timeSinceLastOnline(lastOnline)}\n${targetUser.legitTokens.split(" ").join(", ")}`);
       }
       case "/m/u/g": {
         if (!user) return new Response("");

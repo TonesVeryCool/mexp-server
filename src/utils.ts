@@ -104,7 +104,7 @@ export function serverLog(log:string, disableIfHasEdit:boolean = true) {
     
     if (webhookConfig.url) {
         if (disableIfHasEdit && log.includes("_edit")) return;
-        
+
         const payload = {
             content: log,
             username: webhookConfig.name,
@@ -131,3 +131,24 @@ export const randomLetters = (size:number): string => {
 }
 
 export const lerp = (a:number, b:number, t:number): number => a * (1 - t) + b * t;
+
+export function timeSinceLastOnline(lastOnline:number) {
+    const units = [
+        { name: "year", seconds: 31536000 },
+        { name: "month", seconds: 2592000 },
+        { name: "week", seconds: 604800 },
+        { name: "day", seconds: 86400 },
+        { name: "hour", seconds: 3600 },
+        { name: "minute", seconds: 60 },
+        { name: "second", seconds: 1 }
+    ];
+
+    for (const unit of units) {
+        if (lastOnline >= unit.seconds) {
+            const value = Math.round(lastOnline / unit.seconds);
+            return `${value} ${unit.name}${value !== 1 ? 's' : ''} ago`;
+        }
+    }
+
+    return "just now";
+}

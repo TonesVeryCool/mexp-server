@@ -99,10 +99,12 @@ export function isAuthorized(req:Request): boolean {
     return false;
 }
 
-export function serverLog(log:string) {
+export function serverLog(log:string, disableIfHasEdit:boolean = true) {
     console.log(log);
     
     if (webhookConfig.url) {
+        if (disableIfHasEdit && log.includes("_edit")) return;
+        
         const payload = {
             content: log,
             username: webhookConfig.name,

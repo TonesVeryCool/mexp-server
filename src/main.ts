@@ -109,7 +109,7 @@ if (import.meta.main) {
           return new Response("");
         }
         
-        const player:MexpUser|null = getPlayer(me, config.version >= 36);
+        const player:MexpUser|null = getPlayer(me, (config.version >= 36 && !au));
         if (!player) return new Response("");
         player.lastPlayed = now();
         player.commit();
@@ -148,7 +148,7 @@ if (import.meta.main) {
         
         try {
           const tokens = user.legitTokens.split(" ");
-          if (mapTokens[map] != '' && !tokens.includes(mapTokens[map]) && config.validateMaps) {
+          if (mapTokens[map] != '' && !tokens.includes(mapTokens[map]) && config.validateMaps && !au) {
             throw new Deno.errors.NotFound("Was the map found? I don't know, the user doesn't have access to it!");
           }
           await Deno.lstat(`./assets/maps/${map}.assetBundle`)
@@ -197,7 +197,7 @@ if (import.meta.main) {
         const ghosts:MexpGhost[] = [];
         
         for (const player of getAllPlayers())
-          {
+        {
           if (player.username == user.username) continue;
           if (player.ghost.scene == map) continue;
           ghosts.push(player.ghost);
@@ -286,7 +286,7 @@ if (import.meta.main) {
         const chatMessage:SpeakMessage = new SpeakMessage();
         chatMessage.username = shortenName(user.username);
         chatMessage.message = final;
-        serverLog(`\`${chatMessage.username}: ${chatMessage.message}\``);
+        serverLog(`\`${chatMessage.username}: ${chatMessage.message}\``, false);
         
         chatMessages.push(chatMessage);
         
@@ -308,7 +308,7 @@ if (import.meta.main) {
         }
         
         try {
-          if ((tokenMapping[tk] != map || (tk == "undeground_part2" && !session.legitBallpitAlt)) && config.validateTokens) {
+          if ((tokenMapping[tk] != map || (tk == "undeground_part2" && !session.legitBallpitAlt)) && config.validateTokens && !au) {
             user.cheatTokens += ` ${tk}`;
             user.cheatTokens = user.cheatTokens.trimStart();
             user.commit();

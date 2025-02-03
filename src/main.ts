@@ -200,6 +200,7 @@ if (import.meta.main) {
         {
           if (player.username == user.username) continue;
           if (player.ghost.scene == map) continue;
+          if (map == "map_void") continue;
           ghosts.push(player.ghost);
         }
         

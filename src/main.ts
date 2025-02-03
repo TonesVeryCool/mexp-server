@@ -259,9 +259,15 @@ if (import.meta.main) {
       }
       case "/m/o/c": {
         if (!user) return new Response("");
+        const pa = req.headers.get("pa") ?? "none";
+        const va = req.headers.get("va") ?? "";
         
-        isScreenOn = !isScreenOn;
-        serverLog(`${shortenName(me)} turned the screen ${isScreenOn ? "on" : "off"}.`);
+        if (pa == "ts") {
+          if (config.validateMaps && user.ghost.scene != "map_theater_employee") return;
+          
+          isScreenOn = !isScreenOn;
+          serverLog(`${shortenName(me)} turned the screen ${isScreenOn ? "on" : "off"}.`);
+        }
         
         return new Response("1");
       }

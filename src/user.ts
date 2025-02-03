@@ -23,7 +23,7 @@ export class MexpSession {
             const index = sessions.indexOf(this);
             if (index > -1) sessions.splice(index, 1);
             serverLog(`see you soon, ${shortenName(this.username)}.`);
-        }, 15000);
+        }, 1000 * 60);
     }
 
     public clearMapTimer() {
@@ -119,7 +119,7 @@ export class MexpGhost {
         {
             if (name.startsWith("fuck") && name.length < 64) ghost.type = GhostType.It;
             else if (banned) ghost.type = GhostType.Upgrade;
-            else ghost.type = (now() - lastPlayed >= 15) ? GhostType.Inactive : GhostType.Classic;
+            else ghost.type = (now() - lastPlayed >= 1209600 /* 2 weeks */) ? GhostType.Inactive : GhostType.Classic;
         }
 
         ghost.name = shortenName(ghost.name);

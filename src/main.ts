@@ -263,7 +263,7 @@ if (import.meta.main) {
         const va = req.headers.get("va") ?? "";
         
         if (pa == "ts") {
-          if (config.validateMaps && user.ghost.scene != "map_theater_employee") return;
+          if (config.validateMaps && user.ghost.scene != "map_theater_employee") return new Response("");
           
           isScreenOn = !isScreenOn;
           serverLog(`${shortenName(me)} turned the screen ${isScreenOn ? "on" : "off"}.`);

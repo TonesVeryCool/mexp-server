@@ -228,6 +228,10 @@ if (import.meta.main) {
         const targetUser = getPlayerByShortName(target);
         if (!targetUser) return new Response("");
 
+        if (target == "_work") {
+          return new Response(``);
+        }
+
         if (target == "_edit") {
           return new Response(`_edit\nDon't mess with it.\nalways\nall`);
         }

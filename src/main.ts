@@ -67,7 +67,7 @@ if (import.meta.main) {
           const captcha = new Captcha();
           captchas.push(captcha);
           
-          return new Response(captcha.generateImage(), {
+          return new Response(await captcha.generateImage(), {
             status: 200,
             headers: {
               "content-type": "image/png; charset=binary",
@@ -226,6 +226,10 @@ if (import.meta.main) {
         const target = req.headers.get("pr") ?? shortenName(me);
         const targetUser = getPlayerByShortName(target);
         if (!targetUser) return new Response("");
+
+        if (target == "_edit") {
+          return new Response(`_edit\nDon't mess with it.\nalways\nall`);
+        }
         
         const speakMsg = targetUser.ghost.speak.replace("@", " ").trim();
         const finalMsg = speakMsg == "" ? `` : `'${speakMsg}'`;

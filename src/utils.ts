@@ -78,7 +78,8 @@ export async function getRandomFilePath(folderPath: string): Promise<string | nu
 const validity = (str: string): boolean => /^[a-z]+$/.test(str);
 export const now = (): number => Math.floor(Date.now() / 1000);
 export const shortenName = (me: string): string => me.substring(0, 5);
-export const randf_range = (min:number, max:number) => Math.floor(Math.random() * (max - min) ) + min;
+export const randi_range = (min:number, max:number) => Math.floor(Math.random() * (max - min) ) + min;
+export const randf_range = (min:number, max:number) => Math.random() * (max - min) + min;
 
 export function validateUsername(username:string, authorized:boolean): boolean {
     if (authorized) return true;
@@ -126,3 +127,5 @@ export const randomLetters = (size:number): string => {
     const chars = 'abcdefghijklmnopqrstuvwxyz';
     return Array.from({length: size}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 }
+
+export const lerp = (a:number, b:number, t:number): number => a * (1 - t) + b * t;

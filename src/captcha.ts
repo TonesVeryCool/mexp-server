@@ -1,5 +1,5 @@
 import { createCanvas } from "https://raw.githubusercontent.com/DjDeveloperr/deno-canvas/master/mod.ts";
-import { randf_range, randomString } from "./utils.ts";
+import { lerp, randf_range, randi_range, randomString } from "./utils.ts";
 
 const shuffleString = (str: string): { 
     shuffled: string, 
@@ -25,15 +25,23 @@ export class Captcha {
     constructor() {
         this.resetTimer();
         this.answer = randomString(8);
-    }
+    } 
 
-    public generateImage() {
+    public async generateImage() {
         const canvas = createCanvas(200, 100);
         const ctx = canvas.getContext("2d");
 
-        const gradient = ctx.createLinearGradient(0, 0, 200, 100);
-        gradient.addColorStop(0, "#602bad"); // Start color
-        gradient.addColorStop(1, "#3d1c6e"); // End color
+        canvas.loadFont(await Deno.readFile("./assets/fonts/AtkinsonHyperlegible-Regular.ttf"), { family: 'Hyperlegible Regular' });
+        canvas.loadFont(await Deno.readFile("./assets/fonts/AtkinsonHyperlegible-Bold.ttf"), { family: 'Hyperlegible Bold' });
+
+        const gx0 = lerp(0, 200, randf_range(-1, 0))
+        const gy0 = lerp(0, 100, randf_range(-1, 0))
+        const gx1 = lerp(0, 200, randf_range(1, 2))
+        const gy1 = lerp(0, 100, randf_range(1, 2))
+
+        const gradient = ctx.createLinearGradient(gx0, gy0, gx1, gy1);
+        gradient.addColorStop(0, "#602bad");
+        gradient.addColorStop(1, "#3d1c6e");
 
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, 200, 100);
@@ -41,8 +49,9 @@ export class Captcha {
         for (let i = 0; i < 10; i++) {
             const x0 = randf_range(0, 200);
             const y0 = randf_range(0, 100);
-            const r = randf_range(0.15, 16);
-            ctx.fillStyle = `rgba(255, 255, 255, ${randf_range(0.05, 0.8)})`;
+            const r = randf_range(4, 16);
+            const a = randf_range(0.05, 0.35);
+            ctx.fillStyle = `rgba(255, 255, 255, ${a})`;
 
             ctx.beginPath();
             ctx.arc(x0, y0, r, 0, Math.PI * 2);
@@ -56,7 +65,7 @@ export class Captcha {
         const randomChars = randomString(64);
         for (const char of randomChars)
         {
-            ctx.font = "20px sans-serif";
+            ctx.font = "20px Hyperlegible Bold";
             ctx.fillStyle = `rgba(255, 255, 255, 0.1)`;
 
             const x = randf_range(0, 200);
@@ -66,7 +75,7 @@ export class Captcha {
         }
 
         ctx.strokeStyle = "#ffffff";
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 0.5;
         for (let i = 0; i < 5; i++) {
             ctx.beginPath();
             const x0 = randf_range(-40, 240);
@@ -83,19 +92,20 @@ export class Captcha {
         let j = 0;
         for (const character of shuffledAnswer.shuffled)
         {
+            const randFontSize = randi_range(16, 20);
             const restColor = randf_range(130, 255);
-            ctx.font = "20px sans-serif";
+            ctx.font = `${randFontSize}px Hyperlegible Bold`;
             ctx.fillStyle = `rgba(${restColor}, ${restColor}, ${restColor}, ${randf_range(0.55, 0.8)})`;
 
-            const x = (200 / 4) * (j % 4) + 15 + randf_range(-5, 5);
-            const y = (100 / 2) * Math.floor(j / 4) + 30 + randf_range(-5, 5);
+            const x = (200 / 4) * (j % 4) + (randFontSize - 5) + randf_range(-5, 5);
+            const y = (100 / 2) * Math.floor(j / 4) + (randFontSize + 10) + randf_range(-5, 5);
 
             ctx.fillText(character, x, y);
 
             const characterIndex = shuffledAnswer.order[j] + 1;
-            ctx.font = "10px sans-serif";
-            ctx.fillStyle = `rgba(255, 255, 255, 0.7)`;
-            ctx.fillText(characterIndex.toString(), x + 15, y - 15);
+            ctx.font = "10px Hyperlegible Regular";
+            ctx.fillStyle = `rgba(255, 255, 255, 0.35)`;
+            ctx.fillText(characterIndex.toString(), x + (randFontSize - 5), y - (randFontSize - 5));
             j++;
         }
 

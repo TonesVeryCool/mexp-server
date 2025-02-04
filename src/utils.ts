@@ -100,8 +100,12 @@ export function isAuthorized(req:Request): boolean {
     return false;
 }
 
+export function serverConsoleLog(log:string) {
+    console.log(`%cserver  | %c${log}`, "color: green", "");
+}
+
 export function serverLog(log:string, disableIfHasEdit:boolean = true) {
-    console.log(log);
+    if (config.extraLogging) console.log(log);
     
     if (webhookConfig.url) {
         if (disableIfHasEdit && log.includes("_edit")) return;

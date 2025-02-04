@@ -1,4 +1,4 @@
-import { encode, getRandomFilePath, isAuthorized, now, randf_range, randomLetters, serverLog, shortenName, timeSinceLastOnline, validateUsername } from "./utils.ts";
+import { encode, getRandomFilePath, isAuthorized, now, randf_range, randomLetters, serverConsoleLog, serverLog, shortenName, timeSinceLastOnline, validateUsername } from "./utils.ts";
 import { getAllPlayers, getPlayer, getPlayerByShortName } from "./db.ts";
 import { config, httpsConfig, mapTokens, tokenMapping } from "./config.ts";
 import { sessions, MexpPosition, MexpSession, MexpUser, MexpGhost } from "./user.ts";
@@ -32,13 +32,13 @@ if (import.meta.main) {
     if (me != "" && path != "/m/u/v" && !(config.version >= 36 && me == "none" && (path == "/m/m/c" || path == "/m/u/c"))) {
       session = getSession(me);
       if (!session) {
-        console.log(`Session for user ${me} doesn't exist!`);
+        if (config.extraLogging) console.log(`Session for user ${me} doesn't exist!`);
         return new Response("");
       }
       
       user = session.getUser();
       if (!user) {
-        console.log(`User for session ${me} doesn't exist!`);
+        if (config.extraLogging) console.log(`User for session ${me} doesn't exist!`);
         return new Response("");
       }
     
@@ -186,6 +186,8 @@ if (import.meta.main) {
         user.ghost.scene = map;
         user.ghost.position = MexpPosition.fromString(spawnData);
         user.commit();
+
+        serverConsoleLog(`${me} ${map}`);
         
         return new Response(await Deno.readFile(`./assets/maps/${map}.assetBundle`), {
           status: 200,
@@ -253,6 +255,9 @@ if (import.meta.main) {
         const spawnData = req.headers.get("gh");
         if (spawnData) user.ghost.position = MexpPosition.fromString(spawnData);
         user.commit();
+
+        serverConsoleLog(`${me}`);
+        serverConsoleLog(`${spawnData}`);
         
         return new Response("1");
       }
@@ -346,8 +351,13 @@ if (import.meta.main) {
       }
       case "/m/m/i": {
         if (!user) return new Response("");
+
+        const path = await getRandomFilePath("./assets/images/");
+
+        serverConsoleLog(`${me}`);
+        serverConsoleLog(`sending ${path}`);
         
-        return new Response(await Deno.readFile(`./assets/images/${await getRandomFilePath("./assets/images/")}`), {
+        return new Response(await Deno.readFile(`./assets/images/${path}`), {
           status: 200,
           headers: {
             "content-type": "image/png; charset=binary",
@@ -357,8 +367,13 @@ if (import.meta.main) {
       case "/m/m/t": {
         if (!user) return new Response("");
         if (!isScreenOn) return new Response("");
+
+        const path = await getRandomFilePath("./assets/videos/");
+
+        serverConsoleLog(`${me}`);
+        serverConsoleLog(`sending ${path}`);
         
-        return new Response(await Deno.readFile(`./assets/videos/${await getRandomFilePath("./assets/videos/")}`), {
+        return new Response(await Deno.readFile(`./assets/videos/${path}`), {
           status: 200,
           headers: {
             "content-type": "video/mp4; charset=binary",

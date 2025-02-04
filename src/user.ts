@@ -61,6 +61,8 @@ export class MexpPosition {
         const pos:MexpPosition = new MexpPosition();
         const split = str.split(" ");
 
+        if (split.length != 4) return pos;
+
         pos.x = Number.parseFloat(split[0]);
         pos.y = Number.parseFloat(split[1]);
         pos.z = Number.parseFloat(split[2]);

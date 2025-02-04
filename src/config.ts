@@ -9,6 +9,7 @@ export const config = {
     'authorizerText': '',
     'validateTokens': true,
     'validateMaps': true,
+    'extraLogging': true, // at the cost of inaccuracy, have more logs
     'allTokens': [
         'cave', 'ballpit', 'station', 'station_disco', 'employee',
         'vip', 'theater', 'museum', 'museumexit', 'underground_part1',

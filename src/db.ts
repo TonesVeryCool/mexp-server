@@ -1,4 +1,4 @@
-import { DB, Row } from "https://raw.githubusercontent.com/dyedgreen/deno-sqlite/refs/heads/master/mod.ts";
+import { DB } from "https://raw.githubusercontent.com/dyedgreen/deno-sqlite/refs/heads/master/mod.ts";
 import { MexpGhost, MexpPosition, MexpUser } from "./user.ts";
 import { now } from "./utils.ts";
 import { config } from "./config.ts";

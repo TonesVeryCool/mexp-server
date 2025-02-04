@@ -1,5 +1,6 @@
 import { config, webhookConfig } from "./config.ts";
 
+// deno-lint-ignore no-explicit-any
 const flip = (data: any) => Object.fromEntries(Object.entries(data).map(([key, value]) => [value, key]));
 
 const DecodeTable = {

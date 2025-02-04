@@ -41,10 +41,14 @@ if (import.meta.main) {
         console.log(`User for session ${me} doesn't exist!`);
         return new Response("");
       }
-      
-      session.resetTimer();
-      
+    
       au = isAuthorized(req);
+      if (!validateUsername(me, au)) {
+        user = null;
+        session = null;
+      }
+
+      if (session != null) session.resetTimer();
     }
     
     switch (path)

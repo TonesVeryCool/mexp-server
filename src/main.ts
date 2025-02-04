@@ -319,7 +319,7 @@ if (import.meta.main) {
         }
         
         try {
-          if ((tokenMapping[tk] != map || (tk == "undeground_part2" && !session.legitBallpitAlt)) && config.validateTokens && !au) {
+          if ((tokenMapping[tk] != map || (tk == "underground_part2" && !session.legitBallpitAlt)) && config.validateTokens && !au) {
             user.cheatTokens += ` ${tk}`;
             user.cheatTokens = user.cheatTokens.trimStart();
             user.commit();

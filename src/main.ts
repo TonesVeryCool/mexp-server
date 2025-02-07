@@ -1,4 +1,4 @@
-import { encode, getRandomFilePath, isAuthorized, now, randf_range, randomLetters, serverConsoleLog, serverLog, shortenName, timeSinceLastOnline, validateUsername } from "./utils.ts";
+import { encode, getAllPaths, getRandomFilePath, hasAllTokens, isAuthorized, now, randf_range, randomLetters, serverConsoleLog, serverLog, shortenName, timeSinceLastOnline, validateUsername } from "./utils.ts";
 import { getAllPlayers, getPlayer, getPlayerByShortName } from "./db.ts";
 import { config, httpsConfig, mapTokens, tokenMapping } from "./config.ts";
 import { sessions, MexpPosition, MexpSession, MexpUser, MexpGhost } from "./user.ts";
@@ -150,7 +150,7 @@ if (import.meta.main) {
         
         try {
           const tokens = user.legitTokens.split(" ");
-          if (mapTokens[map] != '' && !tokens.includes(mapTokens[map]) && config.validateMaps && !au) {
+          if (!hasAllTokens(map, tokens) && config.validateMaps && !au) {
             throw new Deno.errors.NotFound("Was the map found? I don't know, the user doesn't have access to it!");
           }
           await Deno.lstat(`./assets/maps/${map}.assetBundle`)
@@ -230,7 +230,7 @@ if (import.meta.main) {
         if (!user) return new Response("");
         const target = req.headers.get("pr") ?? shortenName(me);
         if (target.length != 5) return new Response("");
-        
+
         const targetUser = getPlayerByShortName(target);
         if (!targetUser) return new Response("");
 
@@ -349,6 +349,29 @@ if (import.meta.main) {
         
         return new Response("1");
       }
+      case "/m/m/a": {
+        if (config.version < 37) return new Response("404");
+        const id = req.headers.get("id");
+        
+        if (!id) return new Response("");
+
+        if (id == "0") {
+          const paths:string[] = await getAllPaths("./assets/ads/");
+
+          return new Response(paths.join(";"));
+        }
+
+        serverConsoleLog(`sending ads/${id}`);
+
+        if (id.includes("..")) return new Response("");
+        
+        return new Response(await Deno.readFile(`./assets/ads/${id}`), {
+          status: 200,
+          headers: {
+            "content-type": "image/png; charset=binary",
+          },
+        });
+      }
       case "/m/m/i": {
         if (!user) return new Response("");
 
@@ -384,6 +407,7 @@ if (import.meta.main) {
     
     console.log("====================================================")
     console.log(path);
+    console.log(req.headers);
     return new Response("404");
   })
 }

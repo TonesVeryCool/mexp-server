@@ -1,4 +1,4 @@
-import { config, webhookConfig } from "./config.ts";
+import { config, mapTokens, tokenMapping, webhookConfig } from "./config.ts";
 
 // deno-lint-ignore no-explicit-any
 const flip = (data: any) => Object.fromEntries(Object.entries(data).map(([key, value]) => [value, key]));
@@ -59,7 +59,7 @@ export function encode(str: string): string
     return realStr
 }
 
-export async function getRandomFilePath(folderPath: string): Promise<string | null> {
+export async function getAllPaths(folderPath: string): Promise<string[]> {
     const filePaths: string[] = [];
     
     for await (const entry of Deno.readDir(folderPath)) {
@@ -67,11 +67,13 @@ export async function getRandomFilePath(folderPath: string): Promise<string | nu
             filePaths.push(entry.name);
         }
     }
-    
-    if (filePaths.length === 0) {
-        return null;
-    }
-    
+
+    return filePaths;
+}
+
+export async function getRandomFilePath(folderPath: string): Promise<string | null> {
+    const filePaths: string[] = await getAllPaths(folderPath);
+
     const randomIndex = Math.floor(Math.random() * filePaths.length);
     return filePaths[randomIndex];
 }
@@ -122,6 +124,29 @@ export function serverLog(log:string, disableIfHasEdit:boolean = true) {
             },
             body: JSON.stringify(payload),
         });
+    }
+}
+
+function hasTokenForMap(map:string, tokens:string[]): boolean {
+    try {
+        if (mapTokens[map] == '' || tokens.includes(mapTokens[map]) || !config.validateMaps) return true;
+        return false;
+    } catch (_ex) {
+        return false;
+    }
+}
+
+export function hasAllTokens(map:string, tokens:string[]): boolean {
+    try {
+        if (!config.validateMaps) return true;
+
+        const tokenForMap = mapTokens[map];
+        if (tokenForMap == '') return true;
+
+        const mapForToken = tokenMapping[tokenForMap];
+        return hasAllTokens(mapForToken, tokens) && hasTokenForMap(map, tokens);
+    } catch (_ex) {
+        return false;
     }
 }
 

@@ -55,7 +55,7 @@ if (import.meta.main) {
     {
       case "/anymozu5/me/main/host": {
         const port = config.port == 80 || config.port == 443 ? '': `:${config.port}`;
-        return new Response(encode(`${config.scheme}://${config.ip}${port}/`));
+        return new Response(encode(config.redirectUrl == "" ? `${config.scheme}://${config.ip}${port}/` : config.redirectUrl));
       }
       case `/${config.data}/allowed`: {
         return new Response(config.allowed ? "1" : "0");
@@ -94,8 +94,6 @@ if (import.meta.main) {
               }
               
               return new Response(newMe);
-            } else {
-              return new Response("0");
             }
           }
           return new Response("0");

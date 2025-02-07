@@ -2,8 +2,9 @@ export const config = {
     'scheme': 'http',
     'ip': 'localhost',
     'port': 19968,
+    'redirectUrl': '', // if this is set to anything, /anymozu5/me/main/host responds with this instead of the automatic one
     'data': 'mexp',
-    'version': 35,
+    'version': 37,
     'allowed': true,
     'accountCreation': true,
     'authorizerText': '',

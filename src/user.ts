@@ -2,6 +2,7 @@ import { Row } from "https://raw.githubusercontent.com/dyedgreen/deno-sqlite/ref
 import { db, getPlayer } from "./db.ts";
 import { now, serverLog, shortenName } from "./utils.ts";
 import { lastMessageFrom } from "./speak.ts";
+import { config } from "./config.ts";
 
 export const sessions:MexpSession[] = [];
 
@@ -86,11 +87,12 @@ export class MexpPosition {
 }
 
 export enum GhostType {
-    Classic,
-    Authorized,
-    Upgrade,
-    Inactive,
-    It
+    Classic,     // normal red eyes
+    Authorized,  // _edit eye
+    Upgrade,     // green eye
+    Inactive,    // gray eyes
+    Gone,        // transparent gray eyes (version 37 and above only)
+    It           // _worker/fuck[user] eye (dont know what version added them)
 }
 
 export class MexpGhost {
@@ -113,15 +115,26 @@ export class MexpGhost {
         ghost.name = name;
         ghost.speak = lastMessageFrom(shortenName(name));
 
+        ghost.type = GhostType.Classic;
         if (name.startsWith("_"))
         {
             ghost.type = (name == "_editor") ? GhostType.Authorized : GhostType.It;
         }
         else
         {
-            if (name.startsWith("fuck") && name.length < 64) ghost.type = GhostType.It;
-            else if (banned) ghost.type = GhostType.Upgrade;
-            else ghost.type = (now() - lastPlayed >= 1209600 /* 2 weeks */) ? GhostType.Inactive : GhostType.Classic;
+            if (name.startsWith("fuck") && name.length < 64) {
+                ghost.type = GhostType.It;
+            } else if (banned) {
+                ghost.type = GhostType.Upgrade;
+            }
+
+            if (now() - lastPlayed >= 1209600 /* 2 weeks */) {
+                if (now() - lastPlayed >= 2629746 /* 1 month */ && config.version >= 37) {
+                    ghost.type = GhostType.Gone;
+                } else {
+                    ghost.type = GhostType.Inactive;
+                }
+            }
         }
 
         ghost.name = shortenName(ghost.name);
@@ -129,12 +142,13 @@ export class MexpGhost {
         return ghost;
     }
 
-    private static typeToStr(type:GhostType):string {
+    private static typeToStr(type:GhostType) :string {
         switch (type) {
             case GhostType.Classic: return "Classic";
             case GhostType.Authorized: return "Authorized";
             case GhostType.Upgrade: return "Upgrade";
             case GhostType.Inactive: return "Inactive";
+            case GhostType.Gone: return "Gone";
             case GhostType.It: return "It";
         }
     }

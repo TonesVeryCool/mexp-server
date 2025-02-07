@@ -9,3 +9,4 @@ minexplorer server recreation written in deno
 there are probably more versions that work with this server recreation but they haven't been tested
 - 35
 - 36
+- 37

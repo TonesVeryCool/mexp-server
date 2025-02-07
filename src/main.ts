@@ -113,6 +113,8 @@ if (import.meta.main) {
         
         const player:MexpUser|null = getPlayer(me, (config.version >= 36 && !au));
         if (!player) return new Response("");
+        if (player.banned) return new Response("0");
+
         player.lastPlayed = now();
         player.commit();
         

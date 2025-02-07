@@ -229,6 +229,8 @@ if (import.meta.main) {
       case "/m/u/p": {
         if (!user) return new Response("");
         const target = req.headers.get("pr") ?? shortenName(me);
+        if (target.length != 5) return new Response("");
+        
         const targetUser = getPlayerByShortName(target);
         if (!targetUser) return new Response("");
 

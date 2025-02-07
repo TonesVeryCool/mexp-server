@@ -1,6 +1,6 @@
 import { encode, getAllPaths, getRandomFilePath, hasAllTokens, isAuthorized, now, randf_range, randomLetters, serverConsoleLog, serverLog, shortenName, timeSinceLastOnline, validateUsername } from "./utils.ts";
 import { getAllPlayers, getPlayer, getPlayerByShortName } from "./db.ts";
-import { config, httpsConfig, mapTokens, tokenMapping } from "./config.ts";
+import { config, httpsConfig, tokenMapping } from "./config.ts";
 import { sessions, MexpPosition, MexpSession, MexpUser, MexpGhost } from "./user.ts";
 import { chatMessages, indexesToText, SpeakMessage } from "./speak.ts";
 import { Captcha, captchas } from "./captcha.ts";

@@ -1,7 +1,8 @@
 import { encode, isAuthorized, RoutingInfo, validateUsername } from "./utils.ts";
 import { config, httpsConfig } from "./config.ts";
 import { doRouting as post29Router } from "./version/post29.ts";
-import { doRouting as pre29Router } from "./version/pre29.ts";
+import { doRouting as v28Router } from "./version/28.ts";
+import { doRouting as pre28Router } from "./version/pre28.ts";
 import { getSession, MexpSession, MexpUser } from "./user.ts";
 
 if (import.meta.main) {
@@ -23,7 +24,7 @@ if (import.meta.main) {
     let user:MexpUser|null = null;
     let au:boolean = false;
     
-    if (me != "" && path != (config.version < 29 ? "/m/u/vi" : "/m/u/v") && !(config.version >= 36 && me == "none" && (path == "/m/m/c" || path == "/m/u/c"))) {
+    if (me != "" && path != (config.version == 28 ? "/m/u/vi" : config.version < 28 ? "/m/vi" : "/m/u/v") && !(config.version >= 36 && me == "none" && (path == "/m/m/c" || path == "/m/u/c"))) {
       session = getSession(me);
       if (!session) {
         if (config.extraLogging) console.log(`Session for user ${me} doesn't exist!`);
@@ -64,8 +65,13 @@ if (import.meta.main) {
       if (response) return response;
     }
 
-    if (config.version < 29) {
-      const response = await pre29Router(routingInfo);
+    if (config.version == 28) {
+      const response = await v28Router(routingInfo);
+      if (response) return response;
+    }
+
+    if (config.version < 28) {
+      const response = await pre28Router(routingInfo);
       if (response) return response;
     }
     

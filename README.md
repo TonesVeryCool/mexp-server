@@ -47,7 +47,7 @@ MineXplorer server recreation written with Deno
 | 25             | Guaranteed not working    |
 | 26             | Guaranteed not working    |
 | 27             | Guaranteed not working    |
-| 28             | Guaranteed not working    |
+| 28             | Guaranteed working        |
 | 29             | Guaranteed working        |
 | 30             | Guaranteed working        |
 | 31             | Guaranteed working        |

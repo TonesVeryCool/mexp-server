@@ -137,6 +137,8 @@ export class MexpGhost {
             }
         }
 
+        if (ghost.type == GhostType.It && config.version < 29) ghost.type = GhostType.Classic;
+
         ghost.name = shortenName(ghost.name);
 
         return ghost;
@@ -227,3 +229,6 @@ export class MexpUser {
         return user;
     }
 }
+
+export const hasSession = (me:string): boolean => sessions.some(session => session.username === me);
+export const getSession = (me:string): MexpSession|null => sessions.find(session => session.username === me) ?? null;

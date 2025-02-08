@@ -1,4 +1,5 @@
 import { config, mapTokens, tokenMapping, webhookConfig } from "./config.ts";
+import { MexpSession, MexpUser } from "./user.ts";
 
 // deno-lint-ignore no-explicit-any
 const flip = (data: any) => Object.fromEntries(Object.entries(data).map(([key, value]) => [value, key]));
@@ -181,4 +182,13 @@ export function timeSinceLastOnline(lastOnline:number) {
     }
 
     return "just now";
+}
+
+export interface RoutingInfo {
+    req:Request,
+    path:string,
+    user:MexpUser|null,
+    session:MexpSession|null,
+    me:string,
+    au:boolean
 }

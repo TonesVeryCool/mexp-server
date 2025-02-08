@@ -4,7 +4,7 @@ export const config = {
     'port': 19968,
     'redirectUrl': '', // if this is set to anything, /anymozu5/me/main/host responds with this instead of the automatic one
     'data': 'mexp',
-    'version': 37,
+    'version': 32,
     'allowed': true,
     'accountCreation': true,
     'authorizerText': '',

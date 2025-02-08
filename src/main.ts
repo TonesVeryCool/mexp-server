@@ -50,7 +50,7 @@ if (import.meta.main) {
 
       if (session != null) session.resetTimer();
     }
-    
+
     switch (path)
     {
       case "/anymozu5/me/main/host": {
@@ -261,7 +261,7 @@ if (import.meta.main) {
         serverConsoleLog(`${me}`);
         serverConsoleLog(`${spawnData}`);
         
-        return new Response("1");
+        return new Response(config.version < 35 ? "check" : "1");
       }
       case "/m/o/p": {
         if (!user) return new Response("");
@@ -281,7 +281,7 @@ if (import.meta.main) {
           serverLog(`${shortenName(me)} turned the screen ${isScreenOn ? "on" : "off"}.`);
         }
         
-        return new Response("1");
+        return new Response(config.version < 35 ? "check" : "1");
       }
       case "/m/m/s": {
         if (!user) return new Response("");
@@ -317,7 +317,7 @@ if (import.meta.main) {
           chatMessages.shift();
         }
         
-        return new Response("1");
+        return new Response(config.version < 35 ? "check" : "1");
       }
       case "/m/o/t": {
         if (!user) return new Response("");
@@ -327,7 +327,7 @@ if (import.meta.main) {
         const map = user.ghost.scene;
         
         if (!config.allTokens.includes(tk)) {
-          return new Response("1");
+          return new Response("");
         }
         
         try {
@@ -335,10 +335,12 @@ if (import.meta.main) {
             user.cheatTokens += ` ${tk}`;
             user.cheatTokens = user.cheatTokens.trimStart();
             user.commit();
+
+            return new Response("");
           } else {
             const cheatedTokens = user.cheatTokens.split(" ");
             
-            if (cheatedTokens.includes(tk)) return new Response("1");
+            if (cheatedTokens.includes(tk)) return new Response("");
             
             serverLog(`${shortenName(me)} got a token: \`${tk}\``);
             user.legitTokens += ` ${tk}`;
@@ -349,7 +351,7 @@ if (import.meta.main) {
           // TODO: what is meant to happen if an error occurs?
         }
         
-        return new Response("1");
+        return new Response(config.version < 35 ? "check" : "1");
       }
       case "/m/m/a": {
         if (config.version < 37) return new Response("404");

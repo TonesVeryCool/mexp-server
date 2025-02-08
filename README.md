@@ -51,7 +51,7 @@ MineXplorer server recreation written with Deno
 | 29             | Might work, not confirmed |
 | 30             | Might work, not confirmed |
 | 31             | Might work, not confirmed |
-| 32             | Might work, not confirmed |
+| 32             | Guaranteed working        |
 | 33             | No available build        |
 | 34             | No available build        |
 | 35             | Guaranteed working        |

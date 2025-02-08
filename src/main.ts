@@ -188,7 +188,7 @@ if (import.meta.main) {
         user.commit();
 
         serverConsoleLog(`${me} ${map}`);
-        
+
         return new Response(await Deno.readFile(`./assets/maps/${map}.assetBundle`), {
           status: 200,
           headers: {

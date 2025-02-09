@@ -4,7 +4,7 @@ export const config = {
     'port': 19968,
     'redirectUrl': '', // if this is set to anything, /anymozu5/me/main/host responds with this instead of the automatic one
     'data': 'mexp',
-    'version': 27,
+    'version': 36,
     'allowed': true,
     'accountCreation': true,
     'authorizerText': '',
@@ -52,6 +52,7 @@ export const mapTokens: Record<string, string> = {
     'map_house': '',
     'map_hell': '',
     'map_void': '',
+    'map_void_white': '',
     'map_parkour': '',
     'map_herobrine': '',
     'map_maze': '',

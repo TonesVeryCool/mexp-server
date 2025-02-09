@@ -98,12 +98,8 @@ export const m_gm = async (req:Request, user:MexpUser|null, session:MexpSession|
         map = "map_ballpit_alt";
     }
     
-    if (map == "map_hell") {
-        serverLog(`you deserve it, ${shortenName(me)}.`);
-        session.doMapTimer("map_welcome");
-    }
-    
-    if (map == "map_void") {
+    if (map == "map_hell" || map == "map_void" || map == "map_void_white") {
+        if (map == "map_hell") serverLog(`you deserve it, ${shortenName(me)}.`);
         session.doMapTimer("map_welcome");
     }
     

@@ -3,17 +3,7 @@ import { getPlayer, getPlayerByShortName } from "../db.ts";
 import { config, } from "../config.ts";
 import { MexpSession, MexpUser } from "../user.ts";
 import { Captcha, captchas } from "../captcha.ts";
-import { m_dl, m_gg, m_gm, m_gt, m_sd, m_vi, m_wl, mexp_allowed, mexp_version } from "./shared.ts";
-import { m_ga } from "./shared.ts";
-import { m_gn } from "./shared.ts";
-import { m_sg } from "./shared.ts";
-import { m_pc } from "./shared.ts";
-import { m_cp } from "./shared.ts";
-import { m_gs } from "./shared.ts";
-import { m_ss } from "./shared.ts";
-import { m_st } from "./shared.ts";
-import { m_im } from "./shared.ts";
-import { m_tv } from "./shared.ts";
+import { mexp_allowed, mexp_version, m_ga, m_dl, m_gg, m_gm, m_gt, m_sd, m_vi, m_wl, m_gn, m_sg, m_pc, m_cp, m_gs, m_ss, m_st, m_im, m_tv } from "./shared.ts";
 
 export async function doRouting(info:RoutingInfo) {
   const req:Request = info.req;

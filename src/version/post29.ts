@@ -86,14 +86,13 @@ export async function doRouting(info:RoutingInfo) {
     case "/m/u/p": {
       if (!user) return new Response("");
       const target = req.headers.get("pr") ?? shortenName(me);
-      if (target.length != 5) return new Response("");
+      
+      if (target == "_work" || target.length != 5) {
+        return new Response(`\n\nundefined\nundefined`);
+      }
       
       const targetUser = getPlayerByShortName(target);
       if (!targetUser) return new Response("");
-      
-      if (target == "_work") {
-        return new Response(``);
-      }
       
       if (target == "_edit") {
         return new Response(`_edit\nDon't mess with it.\nalways\nall`);

@@ -129,7 +129,7 @@ export class MexpGhost {
             }
 
             if (now() - lastPlayed >= 1209600 /* 2 weeks */) {
-                if (now() - lastPlayed >= 2629746 /* 1 month */ && config.version >= 37) {
+                if (now() - lastPlayed >= 6574500 /* 2.5 months */ && config.version >= 37) {
                     ghost.type = GhostType.Gone;
                 } else {
                     ghost.type = GhostType.Inactive;

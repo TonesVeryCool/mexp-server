@@ -165,6 +165,7 @@ export const lerp = (a:number, b:number, t:number): number => a * (1 - t) + b * 
 
 export function timeSinceLastOnline(lastOnline:number) {
     const units = [
+        { name: "decade", seconds: 315576000 },
         { name: "month", seconds: 2629800 },
         { name: "week", seconds: 604800 },
         { name: "day", seconds: 86400 },

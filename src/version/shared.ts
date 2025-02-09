@@ -6,11 +6,19 @@ import { hasSession, MexpGhost, MexpPosition, MexpSession, MexpUser, sessions } 
 import { getRandomFilePath, hasAllTokens, now, randf_range, serverConsoleLog, serverLog, shortenName, validateUsername } from "../utils.ts";
 
 export const mexp_allowed = () => {
-    return new Response(config.allowed ? "1" : "0");
+    return new Response(config.allowed ? "1" : "0", {
+        headers: {
+            "content-type": "application/octet-stream",
+        }
+    });
 }
 
 export const mexp_version = () => {
-    return new Response(config.version.toString());
+    return new Response(config.version.toString(), {
+        headers: {
+            "content-type": "application/octet-stream",
+        }
+    });
 }
 
 export const m_dl = () => {

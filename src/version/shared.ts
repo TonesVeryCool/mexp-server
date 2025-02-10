@@ -34,8 +34,13 @@ export const m_vi = (req:Request, me:string, au:boolean) => {
     if (vs != config.version.toString()) {
         return new Response("");
     }
+
+    let accountsAllowed = true;
+
+    if (config.version >= 36 && !au) accountsAllowed = false;
+    if (!config.accountCreation) accountsAllowed = false;
     
-    const player:MexpUser|null = getPlayer(me, (config.version >= 36 && !au && !config.accountCreation));
+    const player:MexpUser|null = getPlayer(me, !accountsAllowed);
     if (!player) return new Response("");
     if (player.banned) return new Response("0");
     
@@ -219,7 +224,7 @@ export const m_ss = async (req:Request, user:MexpUser|null) => {
     
     chatMessages.push(chatMessage);
     
-    if (chatMessages.length > 20) {
+    if (chatMessages.length > 25) {
         chatMessages.shift();
     }
     

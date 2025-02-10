@@ -11,7 +11,18 @@ MineXplorer server recreation written with Deno
 - [ ] 5 character users only (block users with the first 5 characters being the same but the rest being different)
 - [ ] special bans (force hell/force void) (was this ever used outside of `tutwh` anyway?)
 - [ ] game downloads (`/version/mexp`)
-- [ ] test versions below v35
+- [x] test versions below v35
+
+# Inaccuracies
+- Speak has some inaccuracies with word mixing
+- Ghosts and users are not separate, unlike real MineXplorer
+- Profile last online dates might not be 100% accurate
+- Ghost inactivity/gone times might not be 100% accurate
+- Ghost types are definitely not automatically set, and are instead stored in the ghost's data internally, but due to the current database setup this is not the case
+- Captcha images are not 100% accurate (but it's impossible to make them 1:1 with MineXplorer)
+- `map_ballpit_alt` requirements are not 100% accurate
+- The map switch timers might be inaccurate
+- Captcha expiry times might not be 100% accurate
 
 # Version Compatibility
 * `Guaranteed not working`: This version doesn't work with the server recreation.

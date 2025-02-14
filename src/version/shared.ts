@@ -85,8 +85,8 @@ export const m_gm = async (req:Request, user:MexpUser|null, session:MexpSession|
     
     try {
         const tokens = user.legitTokens.split(" ");
-        if (!hasAllTokens(map, tokens) && config.validateMaps && !au && user.lastSpawnData != `${map} ${spawnData}`) {
-            throw new Deno.errors.NotFound("Was the map found? I don't know, the user doesn't have access to it!");
+        if (!hasAllTokens(map, tokens) && config.validateMaps && !au) {
+            if (user.lastSpawnData != `${map} ${spawnData}`) throw new Deno.errors.NotFound("Was the map found? I don't know, the user doesn't have access to it!");
         }
         await Deno.lstat(`./assets/maps/${map}.assetBundle`)
     } catch (err) {
@@ -106,6 +106,10 @@ export const m_gm = async (req:Request, user:MexpUser|null, session:MexpSession|
     if (map == "map_hell" || map == "map_void" || map == "map_void_white") {
         if (map == "map_hell") serverLog(`you deserve it, ${shortenName(me)}.`);
         session.doMapTimer("map_welcome");
+    }
+
+    if (map == "map_void_white" && user.lastSpawnData.split(" ")[0] != "map_void_white") {
+        map = "map_hell"
     }
     
     if (map == "map_maze") {

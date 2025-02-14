@@ -15,10 +15,8 @@ MineXplorer server recreation written with Deno
 
 # Inaccuracies
 - Speak has some inaccuracies with word mixing
-- Ghosts and users are not separate, unlike real MineXplorer
 - Profile last online dates might not be 100% accurate
 - Ghost inactivity/gone times might not be 100% accurate
-- Ghost types are definitely not automatically set, and are instead stored in the ghost's data internally, but due to the current database setup this is not the case
 - Captcha images are not 100% accurate (but it's impossible to make them 1:1 with MineXplorer)
 - `map_ballpit_alt` requirements are not 100% accurate
 - The map switch timers might be inaccurate

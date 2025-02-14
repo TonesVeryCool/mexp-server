@@ -1,5 +1,5 @@
 import { config, tokenMapping } from "../config.ts";
-import { getAllPlayers, getPlayer } from "../db.ts";
+import { getAllGhosts, getAllPlayers, getPlayer } from "../db.ts";
 import { shared } from "../shared.ts";
 import { chatMessages, indexesToText, SpeakMessage } from "../speak.ts";
 import { hasSession, MexpGhost, MexpPosition, MexpSession, MexpUser, sessions } from "../user.ts";
@@ -40,7 +40,7 @@ export const m_vi = (req:Request, me:string, au:boolean) => {
     if (config.version >= 36 && !au) accountsAllowed = false;
     if (!config.accountCreation) accountsAllowed = false;
     
-    const player:MexpUser|null = getPlayer(me, !accountsAllowed);
+    const player:MexpUser|null = getPlayer(me, !accountsAllowed, false);
     if (!player) return new Response("");
     if (player.banned) return new Response("0");
     
@@ -66,7 +66,7 @@ export const m_gt = (user:MexpUser|null) => {
 
 export const m_sd = (user:MexpUser|null) => {
     if (!user) return new Response("");
-    return new Response(`${user.ghost.scene} ${user.ghost.position.str()}`);
+    return new Response(`${user.lastSpawnData}`);
 }
 
 export const m_wl = async (user:MexpUser|null) => {
@@ -85,7 +85,7 @@ export const m_gm = async (req:Request, user:MexpUser|null, session:MexpSession|
     
     try {
         const tokens = user.legitTokens.split(" ");
-        if (!hasAllTokens(map, tokens) && config.validateMaps && !au) {
+        if (!hasAllTokens(map, tokens) && config.validateMaps && !au && user.lastSpawnData != `${map} ${spawnData}`) {
             throw new Deno.errors.NotFound("Was the map found? I don't know, the user doesn't have access to it!");
         }
         await Deno.lstat(`./assets/maps/${map}.assetBundle`)
@@ -111,10 +111,17 @@ export const m_gm = async (req:Request, user:MexpUser|null, session:MexpSession|
     if (map == "map_maze") {
         session.doMapTimer("map_void");
     }
+
+    if (!MexpPosition.testString(spawnData)) {
+        spawnData = "0 0.9 0 0";
+    }
     
     user.ghost.scene = map;
     user.ghost.position = MexpPosition.fromString(spawnData);
+    user.lastSpawnData = `${map} ${spawnData}`;
+
     user.commit();
+    user.ghost.commit();
     
     serverConsoleLog(`${me} ${map}`);
     
@@ -128,16 +135,16 @@ export const m_gm = async (req:Request, user:MexpUser|null, session:MexpSession|
 
 export const m_gg = (user:MexpUser|null) => {
     if (!user) return new Response("");
-    const map = user.ghost.scene ?? "";
+    const map = user.lastSpawnData.split(" ")[0] ?? "";
     
     const ghosts:MexpGhost[] = [];
     
-    for (const player of getAllPlayers())
+    for (const ghost of getAllGhosts())
     {
-        if (player.username == user.username) continue;
-        if (player.ghost.scene != map) continue;
+        if (ghost.name == user.username) continue;
+        if (ghost.scene != map) continue;
         if (map == "map_void") continue;
-        ghosts.push(player.ghost);
+        ghosts.push(ghost);
     }
     
     let final:string = "";
@@ -163,11 +170,18 @@ export const m_sg = (req:Request, user:MexpUser|null, me:string) => {
     if (!user) return new Response("");
     
     const spawnData = req.headers.get("gh");
-    if (spawnData) user.ghost.position = MexpPosition.fromString(spawnData);
-    user.commit();
-    
-    serverConsoleLog(`${me}`);
-    serverConsoleLog(`${spawnData}`);
+
+    if (spawnData) {
+        if (!MexpPosition.testString(spawnData)) {
+            return new Response("0");
+        }
+
+        user.ghost.position = MexpPosition.fromString(spawnData);
+        user.ghost.commit();
+        
+        serverConsoleLog(`${me}`);
+        serverConsoleLog(`${spawnData}`);
+    }
     
     return new Response(config.version < 35 ? "check" : "1");
 }
@@ -213,12 +227,12 @@ export const m_ss = async (req:Request, user:MexpUser|null) => {
     const message = req.headers.get("sp") ?? "";
     const split = message.split(" ");
     
-    if (split.length == 0) return new Response("");
+    if (split.length == 0 || split.length > 26) return new Response("");
     
     const final = await indexesToText(split);
     
     const chatMessage:SpeakMessage = new SpeakMessage();
-    chatMessage.username = shortenName(user.username);
+    chatMessage.username = user.username;
     chatMessage.message = final;
     serverLog(`\`${chatMessage.username}: ${chatMessage.message}\``, false);
     

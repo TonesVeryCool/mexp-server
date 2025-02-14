@@ -1,8 +1,9 @@
 import { Row } from "https://raw.githubusercontent.com/dyedgreen/deno-sqlite/refs/heads/master/mod.ts";
-import { db, getPlayer } from "./db.ts";
+import { db, getGhost, getPlayer } from "./db.ts";
 import { now, serverLog, shortenName } from "./utils.ts";
 import { lastMessageFrom } from "./speak.ts";
 import { config } from "./config.ts";
+import { canBeFloat } from "./utils.ts";
 
 export const sessions:MexpSession[] = [];
 
@@ -48,7 +49,7 @@ export class MexpSession {
     }
 
     public getUser(): MexpUser|null {
-        return getPlayer(this.username, true);
+        return getPlayer(this.username, true, true);
     }
 }
 
@@ -57,6 +58,12 @@ export class MexpPosition {
     y:number = 0.9;
     z:number = 0;
     r:number = 0;
+
+    static testString(str: string): boolean {
+        const split = str.split(" ");
+        if (split.length != 4) return false;
+        return canBeFloat(split[0]) && canBeFloat(split[1]) && canBeFloat(split[2]) && canBeFloat(split[3]);
+    }
 
     static fromString(str: string): MexpPosition {
         const pos:MexpPosition = new MexpPosition();
@@ -92,59 +99,49 @@ export enum GhostType {
     Upgrade,     // green eye
     Inactive,    // gray eyes
     Gone,        // transparent gray eyes (version 37 and above only)
-    It           // _worker/fuck[user] eye (dont know what version added them)
+    It           // _worker/fuck[user] eye (version 29 and above only)
 }
 
 export class MexpGhost {
     name:string = "";
-    speak:string = "NO MESSAGE";
+    type:GhostType = GhostType.Classic;
     scene:string = "map_welcome";
     position:MexpPosition = new MexpPosition;
-    type:GhostType = GhostType.Classic;
+    speak:string = "NO MESSAGE";
 
-    static fromRow(row: Row): MexpGhost {
+    static fromRow(row: Row, lastPlayed: number = -1): MexpGhost {
         const ghost:MexpGhost = new MexpGhost();
 
+        ghost.name = row[0] as string;
+        ghost.type = MexpGhost.strToType(row[1] as string);
         ghost.scene = row[2] as string;
-        ghost.position = MexpPosition.fromRow(row);
-
-        const name = row[0] as string;
-        const banned = row[1] as boolean;
-        const lastPlayed = row[9] as number;
-
-        ghost.name = name;
-        ghost.speak = lastMessageFrom(shortenName(name));
-
-        ghost.type = GhostType.Classic;
-        if (name.startsWith("_"))
-        {
-            ghost.type = (name == "_editor") ? GhostType.Authorized : GhostType.It;
-        }
-        else
-        {
-            if (name.startsWith("fuck") && name.length < 64) {
-                ghost.type = GhostType.It;
-            } else if (banned) {
-                ghost.type = GhostType.Upgrade;
-            }
-
-            if (now() - lastPlayed >= 1209600 /* 2 weeks */) {
-                if (now() - lastPlayed >= 26298000 /* 10 months */ && config.version >= 37) {
-                    ghost.type = GhostType.Gone;
-                } else {
-                    ghost.type = GhostType.Inactive;
-                }
-            }
-        }
-
-        if (ghost.type == GhostType.It && config.version < 29) ghost.type = GhostType.Classic;
-
-        ghost.name = shortenName(ghost.name);
+        ghost.position = MexpPosition.fromString(row[3] as string);
+        ghost.speak = lastMessageFrom(name);
+        
+        ghost.doTypeCheck(lastPlayed);
 
         return ghost;
     }
 
-    private static typeToStr(type:GhostType) :string {
+    static fromUser(user: string): MexpGhost|null {
+        const player:MexpUser|null = getPlayer(user, true, false);
+        if (!player) return null;
+        return getGhost(player);
+    }
+
+    private static strToType(type:string): GhostType {
+        switch (type) {
+            case "Classic": return GhostType.Classic;
+            case "Authorized": return GhostType.Authorized;
+            case "Upgrade": return GhostType.Upgrade;
+            case "Inactive": return GhostType.Inactive;
+            case "Gone": return GhostType.Gone;
+            case "It": return GhostType.It;
+            default: return GhostType.Classic;
+        }
+    }
+
+    private static typeToStr(type:GhostType): string {
         switch (type) {
             case GhostType.Classic: return "Classic";
             case GhostType.Authorized: return "Authorized";
@@ -155,18 +152,73 @@ export class MexpGhost {
         }
     }
 
+    public doTypeCheck(lastPlayed:number) {
+        if (this.type == GhostType.Classic && lastPlayed != -1)
+        {
+            if (now() - lastPlayed >= 1209600 /* 2 weeks */) {
+                if (now() - lastPlayed >= 26298000 /* 10 months */ && config.version >= 37) {
+                    this.type = GhostType.Gone;
+                } else {
+                    this.type = GhostType.Inactive;
+                }
+            }
+        }
+
+        if (this.type == GhostType.It && config.version < 29) this.type = GhostType.Classic;
+    }
+
     public str(): string {
         return `${this.position.str()} ${MexpGhost.typeToStr(this.type)} ${this.name} ${this.speak}`
+    }
+
+    public commit() {
+        if (this.existsOnDB()) {
+            this.updateOnDB();
+        } else {
+            this.createOnDB();
+        }
+    }
+
+    public existsOnDB() {
+        const stmt = db.prepareQuery("SELECT * FROM ghosts WHERE username = ?");
+        const rows = stmt.all([this.name]);
+        stmt.finalize();
+        return rows.length > 0;
+    }
+
+    private updateOnDB() {
+        const stmt = db.prepareQuery("UPDATE ghosts SET ghostType = ?, scene = ?, pos = ? WHERE username = ?");
+        stmt.execute([
+            MexpGhost.typeToStr(this.type),
+            this.scene,
+            this.position.str(),
+            this.name
+        ]);
+        stmt.finalize();
+    }
+
+    private createOnDB() {
+        const stmt = db.prepareQuery("INSERT INTO ghosts (username, ghostType, scene, pos) VALUES (?, ?, ?, ?)");
+        stmt.execute([
+            this.name,
+            MexpGhost.typeToStr(this.type),
+            this.scene,
+            this.position.str()
+        ]);
+        stmt.finalize();
     }
 }
 
 export class MexpUser {
-    username:string = "_editor";
+    username:string = "_edit";
+    pass:string = "or";
     banned:boolean = false;
-    ghost: MexpGhost = new MexpGhost;
+    lastSpawnData:string = "map_welcome 0 0.9 0 0";
     legitTokens:string = "";
     cheatTokens:string = "";
     lastPlayed:number = 0;
+    
+    ghost: MexpGhost = new MexpGhost;
 
     public commit() {
         if (this.existsOnDB()) {
@@ -184,48 +236,50 @@ export class MexpUser {
     }
 
     private updateOnDB() {
-        const stmt = db.prepareQuery("UPDATE users SET banned = ?, scene = ?, x = ?, y = ?, z = ?, r = ?, legitTokens = ?, cheatTokens = ?, lastPlayed = ? WHERE username = ?");
+        const stmt = db.prepareQuery("UPDATE users SET banned = ?, lastSpawnData = ?, legitTokens = ?, cheatTokens = ?, lastPlayed = ? WHERE username = ? AND pass = ?");
         stmt.execute([
             this.banned,
-            this.ghost.scene,
-            this.ghost.position.x,
-            this.ghost.position.y,
-            this.ghost.position.z,
-            this.ghost.position.r,
+            this.lastSpawnData,
             this.legitTokens,
             this.cheatTokens,
             this.lastPlayed,
-            this.username
+            this.username,
+            this.pass
         ]);
         stmt.finalize();
     }
 
     private createOnDB() {
-        const stmt = db.prepareQuery("INSERT INTO users (username, banned, scene, x, y, z, r, legitTokens, cheatTokens, lastPlayed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        const stmt = db.prepareQuery("INSERT INTO users (username, pass, banned, lastSpawnData, legitTokens, cheatTokens, lastPlayed) VALUES (?, ?, ?, ?, ?, ?, ?)");
         stmt.execute([
             this.username,
+            this.pass,
             this.banned,
-            this.ghost.scene,
-            this.ghost.position.x,
-            this.ghost.position.y,
-            this.ghost.position.z,
-            this.ghost.position.r,
+            this.lastSpawnData,
             this.legitTokens,
             this.cheatTokens,
             this.lastPlayed
         ]);
         stmt.finalize();
+
+        this.ghost.commit();
     }
 
-    static fromRow(row: Row): MexpUser {
+    static fromRow(row: Row, getGhost:boolean): MexpUser {
         const user:MexpUser = new MexpUser();
 
         user.username = row[0] as string;
-        user.banned = row[1] as boolean;
-        user.ghost = MexpGhost.fromRow(row);
-        user.legitTokens = row[7] as string;
-        user.cheatTokens = row[8] as string;
-        user.lastPlayed = row[9] as number;
+        user.pass = row[1] as string;
+        user.banned = row[2] as boolean;
+        user.lastSpawnData = row[3] as string;
+        user.legitTokens = row[4] as string;
+        user.cheatTokens = row[5] as string;
+        user.lastPlayed = row[6] as number;
+
+        if (getGhost) {
+            const ghost:MexpGhost|null = MexpGhost.fromUser(user.username);
+            if (ghost) user.ghost = ghost;
+        }
         return user;
     }
 }

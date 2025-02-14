@@ -163,6 +163,11 @@ export const randomLetters = (size:number): string => {
 
 export const lerp = (a:number, b:number, t:number): number => a * (1 - t) + b * t;
 
+export const canBeFloat = (value: string): boolean => {
+    const num = parseFloat(value);
+    return !isNaN(num) && isFinite(num);
+}
+
 export function timeSinceLastOnline(lastOnline:number) {
     const units = [
         { name: "decade", seconds: 315576000 },

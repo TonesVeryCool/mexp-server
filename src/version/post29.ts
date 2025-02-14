@@ -1,5 +1,5 @@
 import { getAllPaths, now, randomLetters, RoutingInfo, serverConsoleLog, shortenName, timeSinceLastOnline } from "../utils.ts";
-import { getPlayer, getPlayerByShortName } from "../db.ts";
+import { getPlayer } from "../db.ts";
 import { config, } from "../config.ts";
 import { MexpSession, MexpUser } from "../user.ts";
 import { Captcha, captchas } from "../captcha.ts";
@@ -46,7 +46,7 @@ export async function doRouting(info:RoutingInfo) {
           if (captcha.answer == ca) {
             const newMe = randomLetters(64);
             
-            const player:MexpUser|null = getPlayer(newMe, false);
+            const player:MexpUser|null = getPlayer(newMe, false, false);
             if (!player) {
               return new Response("0");
             }
@@ -87,12 +87,8 @@ export async function doRouting(info:RoutingInfo) {
       if (!user) return new Response("");
       const target = req.headers.get("pr") ?? shortenName(me);
       
-      if (target == "_work" || target.length != 5) {
-        return new Response(`\n\nundefined\nundefined`);
-      }
-      
-      const targetUser = getPlayerByShortName(target);
-      if (!targetUser) return new Response("");
+      const targetUser = getPlayer(target, true, false);
+      if (!targetUser) return new Response("\n\nundefined\nundefined");
       
       if (target == "_edit") {
         return new Response(`_edit\nDon't mess with it.\nalways\nall`);

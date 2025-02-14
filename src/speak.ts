@@ -13,22 +13,36 @@ export async function indexesToText(str:string[]) {
     const wordListSplit = wordList.split(" ");
 
     let lastWord = "";
+    let linkAmount = 0;
     for (const idxString of str) {
         try {
             const idxNumber = Number.parseInt(idxString);
 
-            if (idxNumber >= wordListSplit.length || idxNumber < 0) {
+            if (idxNumber >= wordListSplit.length) {
                 final += "undefined ";
                 lastWord = "undefined";
+            } else if (idxNumber < 0) {
+                final += " ";
+                lastWord = "";
             } else {
                 const word = wordListSplit[idxNumber];
-                if (word == "s" || word == "ing" || word == "ed" || word == "." || word == "," || word == ":" || word == "!" || word == "?" || word == "'s" || word == "'ll" || lastWord == "un")
+                if (word != lastWord) {
+                    linkAmount = 0;
+                }
+                if (word == "s" || word == "ing" || word == "ed" || word == "d" || word == "." || word == "," || word == ":" || word == "!" || word == "?" || word == "'s" || word == "'ll" || (lastWord == "un" && (word == "follow")))
                 {
-                    final += `${word}`;
+                    if (linkAmount == 2 && (word == "s" || word == "ed" || word == "d")) {
+                        final += ` ${word}`;
+                        linkAmount = 1;
+                    } else {
+                        final += `${word}`;
+                        linkAmount++;
+                    }
                 }
                 else
                 {
                     final += ` ${word}`;
+                    linkAmount = 0;
                 }
                 lastWord = word;
             }
@@ -41,4 +55,4 @@ export async function indexesToText(str:string[]) {
     return final.trim();
 }
 
-export const lastMessageFrom = (me:string) => chatMessages.findLast(msg => msg.username === shortenName(me))?.message.split(" ").join("@") ?? "@";
+export const lastMessageFrom = (me:string) => chatMessages.findLast(msg => msg.username === me)?.message.split(" ").join("@") ?? "@";

@@ -8,7 +8,7 @@ MineXplorer server recreation written with Deno
 # TODO
 - [ ] speak toggle option in config
 - [ ] shared ghosts between maps
-- [ ] 5 character users only (block users with the first 5 characters being the same but the rest being different)
+- [x] 5 character users only (block users with the first 5 characters being the same but the rest being different)
 - [ ] special bans (force hell/force void) (was this ever used outside of `tutwh` anyway?)
 - [ ] game downloads (`/version/mexp`)
 - [x] test versions below v35

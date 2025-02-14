@@ -77,7 +77,10 @@ export const m_wl = async (user:MexpUser|null) => {
 export const m_gm = async (req:Request, user:MexpUser|null, session:MexpSession|null, me:string, au:boolean) => {
     if (!user || !session) return new Response("");
     
+    const oldLegitBPA = session.legitBallpitAlt;
     session.legitBallpitAlt = false;
+    if (oldLegitBPA && user.lastSpawnData.split(" ")[0] == "map_ballpit_alt") session.legitBallpitAlt = true;
+    
     session.clearMapTimer();
     
     let map = req.headers.get("map") ?? "map_void";

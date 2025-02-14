@@ -19,6 +19,12 @@ export const config = {
     'ballpitAltChance': 2 // percentage
 }
 
+export const speakConfig = {
+    'speakEnabled': true,
+    'ingameError': 'speak is disabled.',
+    'webhookError': 'deny',
+}
+
 // if using a reverse proxy that has https, this is useless
 // only use this if you **want** it to only be accessible with http
 export const httpsConfig = {

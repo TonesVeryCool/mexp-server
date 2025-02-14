@@ -6,7 +6,7 @@ MineXplorer server recreation written with Deno
 - Prod: `deno task run`
 
 # TODO
-- [ ] speak toggle option in config
+- [x] speak toggle option in config
 - [ ] shared ghosts between maps
 - [x] 5 character users only (block users with the first 5 characters being the same but the rest being different)
 - [ ] special bans (force hell/force void) (was this ever used outside of `tutwh` anyway?)

@@ -1,5 +1,5 @@
-import { config, tokenMapping } from "../config.ts";
-import { getAllGhosts, getAllPlayers, getPlayer } from "../db.ts";
+import { config, speakConfig, tokenMapping } from "../config.ts";
+import { getAllGhosts, getPlayer } from "../db.ts";
 import { shared } from "../shared.ts";
 import { chatMessages, indexesToText, SpeakMessage } from "../speak.ts";
 import { hasSession, MexpGhost, MexpPosition, MexpSession, MexpUser, sessions } from "../user.ts";
@@ -209,6 +209,8 @@ export const m_cp = (req:Request, user:MexpUser|null, me:string) => {
 
 export const m_gs = (user:MexpUser|null) => {
     if (!user) return new Response("");
+
+    if (!speakConfig.speakEnabled) return new Response(speakConfig.ingameError);
     
     let final:string = "";
     
@@ -234,8 +236,15 @@ export const m_ss = async (req:Request, user:MexpUser|null) => {
     const chatMessage:SpeakMessage = new SpeakMessage();
     chatMessage.username = user.username;
     chatMessage.message = final;
-    serverLog(`\`${chatMessage.username}: ${chatMessage.message}\``, false);
+    if (!speakConfig.speakEnabled) {
+        serverLog(speakConfig.webhookError, false);
+    } else {
+        serverLog(`\`${chatMessage.username}: ${chatMessage.message}\``, false);
+    }
+    serverConsoleLog(`${chatMessage.username} "${chatMessage.message}"`);
     
+    if (!speakConfig.speakEnabled) return new Response("0");
+
     chatMessages.push(chatMessage);
     
     if (chatMessages.length > 25) {

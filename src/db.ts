@@ -31,7 +31,7 @@ export function getPlayer(username: string, dontCreate:boolean, getGhost:boolean
         stmt.finalize();
 
         const final = MexpUser.fromRow(info, getGhost);
-        if (final.pass != pass) return null;
+        if (final.pass != pass && pass != "") return null;
         return final;
     } else {
         if (!config.accountCreation || dontCreate || username.length == 5)

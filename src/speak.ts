@@ -1,5 +1,3 @@
-import { shortenName } from "./utils.ts";
-
 export class SpeakMessage {
     username:string = "_editor";
     message:string = "hello world ";

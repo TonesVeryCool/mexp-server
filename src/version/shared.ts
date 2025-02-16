@@ -3,7 +3,7 @@ import { getAllGhosts, getPlayer } from "../db.ts";
 import { shared } from "../shared.ts";
 import { chatMessages, indexesToText, SpeakMessage } from "../speak.ts";
 import { hasSession, MexpGhost, MexpPosition, MexpSession, MexpUser, sessions } from "../user.ts";
-import { getRandomFilePath, hasAllTokens, now, randf_range, serverConsoleLog, serverLog, shortenName, validateUsername } from "../utils.ts";
+import { getRandomFilePath, hasAllTokens, mixingForMap, now, randf_range, serverConsoleLog, serverLog, shortenName, validateUsername } from "../utils.ts";
 
 export const mexp_allowed = () => {
     return new Response(config.allowed ? "1" : "0", {
@@ -149,7 +149,8 @@ export const m_gg = (user:MexpUser|null) => {
     for (const ghost of getAllGhosts())
     {
         if (ghost.name == user.username) continue;
-        if (ghost.scene != map) continue;
+        const mapping = mixingForMap(map);
+        if (!mapping.includes(ghost.scene)) continue;
         if (map == "map_void") continue;
         ghosts.push(ghost);
     }

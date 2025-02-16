@@ -37,6 +37,13 @@ export const webhookConfig = {
     'name': 'MineXplorer',
 }
 
+export const ghostMixing: Array<Array<string>> = [
+    ["map_welcome", "map_house", "map_welcome_beach"],
+    ["map_cave", "map_cave_pond"],
+    ["map_ballpit", "map_ballpit_cave"],
+    
+]
+
 export const tokenMapping: Record<string, string> = {
     'cave': 'map_welcome',
     'ballpit': 'map_void',

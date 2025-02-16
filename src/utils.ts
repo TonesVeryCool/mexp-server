@@ -1,4 +1,4 @@
-import { config, mapTokens, tokenMapping, webhookConfig } from "./config.ts";
+import { config, ghostMixing, mapTokens, tokenMapping, webhookConfig } from "./config.ts";
 import { MexpSession, MexpUser } from "./user.ts";
 
 // deno-lint-ignore no-explicit-any
@@ -187,6 +187,16 @@ export function timeSinceLastOnline(lastOnline:number) {
     }
 
     return "just now";
+}
+
+export const mixingForMap = (map:string): Array<string> => {
+    for (const mapping of ghostMixing)
+    {
+        if (mapping.includes(map)) {
+            return mapping;
+        }
+    }
+    return [map]
 }
 
 export interface RoutingInfo {

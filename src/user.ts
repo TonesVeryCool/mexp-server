@@ -40,7 +40,7 @@ export class MexpSession {
             if (!user) return;
             user.ghost.scene = finalMap;
             user.commit();
-        }, 1000 * 60 * 10);
+        }, 1000 * 60 * 4);
     }
 
     destroy() {

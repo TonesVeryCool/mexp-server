@@ -27,6 +27,7 @@ MineXplorer server recreation written with Deno
 * `Might work, not confirmed`: Due to similarities with another compatible version, it might work, but it hasn't been tested.
 * `Guaranteed working`: This version works with the server recreation.
 * `No available build`: A build of this version is not available and as such cannot be tested, although it is most likely not functional. This does **not** mean a build does not exist.
+* `No available build (work)`: A build of this version is not available and as such cannot be tested, although it is most likely functional. This does **not** mean a build does not exist.
 
 | Version (mexp) | Support Status            |
 | -------------- | ------------------------- |
@@ -61,8 +62,8 @@ MineXplorer server recreation written with Deno
 | 30             | Guaranteed working        |
 | 31             | Guaranteed working        |
 | 32             | Guaranteed working        |
-| 33             | No available build        |
-| 34             | No available build        |
+| 33             | No available build (work) |
+| 34             | No available build (work) |
 | 35             | Guaranteed working        |
 | 36             | Guaranteed working        |
 | 37             | Guaranteed working        |

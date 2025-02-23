@@ -181,7 +181,9 @@ export function timeSinceLastOnline(lastOnline:number) {
 
     for (const unit of units) {
         if (lastOnline >= unit.seconds) {
-            const value = Math.round(lastOnline / unit.seconds);
+            let value = Math.round(lastOnline / unit.seconds);
+            if (unit.name == "month" && value > 12) value = 12;
+            
             return `${value} ${unit.name}${value !== 1 ? 's' : ''} ago`;
         }
     }

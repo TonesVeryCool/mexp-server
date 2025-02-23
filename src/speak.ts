@@ -27,7 +27,7 @@ export async function indexesToText(str:string[]) {
                 if (word != lastWord) {
                     linkAmount = 0;
                 }
-                if (word == "s" || word == "ing" || word == "ed" || word == "d" || word == "." || word == "," || word == ":" || word == "!" || word == "?" || word == "'s" || word == "'ll" || (lastWord == "un" && (word == "follow")))
+                if (word == "s" || word == "ing" || word == "ed" || word == "d" || word == "." || word == "," || word == ":" || word == "!" || word == "?" || word == "'s" || word == "'ll" || word == "ly" || (lastWord == "un" && (word == "follow")))
                 {
                     if (linkAmount == 2 && (word == "s" || word == "ed" || word == "d")) {
                         final += ` ${word}`;

@@ -107,7 +107,7 @@ export class MexpGhost {
     type:GhostType = GhostType.Classic;
     scene:string = "map_welcome";
     position:MexpPosition = new MexpPosition;
-    speak:string = "NO MESSAGE";
+    speak:string = "@";
 
     static fromRow(row: Row, lastPlayed: number = -1): MexpGhost {
         const ghost:MexpGhost = new MexpGhost();

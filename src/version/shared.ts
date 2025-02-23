@@ -161,7 +161,7 @@ export const m_gg = (user:MexpUser|null) => {
         final += `${ghost.str()}\n`;
     }
     
-    return new Response(final.trim());
+    return new Response(final.substring(0, final.length - 1));
 }
 
 export const m_ga = async (user:MexpUser|null) => {

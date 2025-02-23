@@ -1,5 +1,5 @@
 export class SpeakMessage {
-    username:string = "_editor";
+    username:string = "_edit";
     message:string = "hello world ";
 }
 
@@ -53,4 +53,4 @@ export async function indexesToText(str:string[]) {
     return final.trim();
 }
 
-export const lastMessageFrom = (me:string) => chatMessages.findLast(msg => msg.username === me)?.message.split(" ").join("@") ?? "@";
+export const lastMessageFrom = (me:string) => chatMessages.findLast(msg => msg.username === me)?.message.split(" ").join("@") ?? "";

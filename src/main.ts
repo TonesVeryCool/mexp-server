@@ -4,6 +4,7 @@ import { doRouting as post29Router } from "./version/post29.ts";
 import { doRouting as v28Router } from "./version/28.ts";
 import { doRouting as pre28Router } from "./version/pre28.ts";
 import { getSession, MexpSession, MexpUser } from "./user.ts";
+import { version_mexp } from "./version/shared.ts";
 
 if (import.meta.main) {
   const usesHttps = (httpsConfig.fullchain && httpsConfig.privkey);
@@ -58,6 +59,10 @@ if (import.meta.main) {
     if (path == "/anymozu5/me/main/host") {
       const port = config.port == 80 || config.port == 443 ? '': `:${config.port}`;
       return new Response(encode(config.redirectUrl == "" ? `${config.scheme}://${config.ip}${port}/` : config.redirectUrl));
+    }
+
+    if (path == "/version/mexp") {
+      return await version_mexp();
     }
 
     if (config.version >= 29) {

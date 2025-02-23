@@ -5,6 +5,15 @@ import { chatMessages, indexesToText, SpeakMessage } from "../speak.ts";
 import { hasSession, MexpGhost, MexpPosition, MexpSession, MexpUser, sessions } from "../user.ts";
 import { getRandomFilePath, hasAllTokens, mixingForMap, now, randf_range, serverConsoleLog, serverLog, shortenName, validateUsername } from "../utils.ts";
 
+export const version_mexp = async () => {
+    return new Response(await Deno.readFile(`./assets/latest.7z`), {
+        status: 200,
+        headers: {
+            "content-type": "application/octet-stream",
+        },
+    })
+}
+
 export const mexp_allowed = () => {
     return new Response(config.allowed ? "1" : "0", {
         headers: {

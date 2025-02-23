@@ -10,7 +10,7 @@ MineXplorer server recreation written with Deno
 - [x] shared ghosts between maps
 - [x] 5 character users only (block users with the first 5 characters being the same but the rest being different)
 - [ ] special bans (force hell/force void) (was this ever used outside of `tutwh` anyway?)
-- [ ] game downloads (`/version/mexp`)
+- [x] game downloads (`/version/mexp`)
 - [x] test versions below v35
 
 # Inaccuracies

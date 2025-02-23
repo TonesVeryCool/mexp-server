@@ -1,16 +1,19 @@
-export const config = {
+export const serverConfig = {
     'scheme': 'http',
     'ip': 'localhost',
     'port': 19968,
     'redirectUrl': '', // if this is set to anything, /anymozu5/me/main/host responds with this instead of the automatic one
     'data': 'mexp',
-    'version': 35,
+    'extraLogging': true // at the cost of inaccuracy, have more logs
+}
+
+export const gameConfig = {
+    'version': 37,
     'allowed': true,
     'accountCreation': true,
-    'authorizerText': '',
+    'authorizerHash': 'the hash128 of authorizer.txt here',
     'validateTokens': true,
     'validateMaps': true,
-    'extraLogging': true, // at the cost of inaccuracy, have more logs
     'allTokens': [
         'cave', 'ballpit', 'station', 'station_disco', 'employee',
         'vip', 'theater', 'museum', 'museumexit', 'underground_part1',

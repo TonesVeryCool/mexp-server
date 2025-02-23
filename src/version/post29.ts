@@ -1,6 +1,6 @@
 import { getAllPaths, now, randomLetters, RoutingInfo, serverConsoleLog, shortenName, timeSinceLastOnline } from "../utils.ts";
 import { getPlayer } from "../db.ts";
-import { config, } from "../config.ts";
+import { serverConfig, gameConfig } from "../config.ts";
 import { MexpSession, MexpUser } from "../user.ts";
 import { Captcha, captchas } from "../captcha.ts";
 import { mexp_allowed, mexp_version, m_ga, m_dl, m_gg, m_gm, m_gt, m_sd, m_vi, m_wl, m_gn, m_sg, m_pc, m_cp, m_gs, m_ss, m_st, m_im, m_tv } from "./shared.ts";
@@ -15,17 +15,17 @@ export async function doRouting(info:RoutingInfo) {
 
   switch (path)
   {
-    case `/${config.data}/allowed`: {
+    case `/${serverConfig.data}/allowed`: {
       return mexp_allowed();
     }
-    case `/${config.data}/version`: {
+    case `/${serverConfig.data}/version`: {
       return mexp_version();
     }
     case "/m/m/d": {
       return m_dl();
     }
     case "/m/m/c": {
-      if (config.version >= 36) {
+      if (gameConfig.version >= 36) {
         const captcha = new Captcha();
         captchas.push(captcha);
         
@@ -40,7 +40,7 @@ export async function doRouting(info:RoutingInfo) {
       }
     }
     case "/m/u/c": {
-      if (config.version >= 36) {
+      if (gameConfig.version >= 36) {
         const ca = req.headers.get("ca") ?? "wrong";
         for (const captcha of captchas) {
           if (captcha.answer == ca) {
@@ -123,7 +123,7 @@ export async function doRouting(info:RoutingInfo) {
       return m_st(req, user, session, me, au);
     }
     case "/m/m/a": {
-      if (config.version < 37) return new Response("404");
+      if (gameConfig.version < 37) return new Response("404");
       const id = req.headers.get("id");
       
       if (!id) return new Response("");

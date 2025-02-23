@@ -1,7 +1,7 @@
 import { DB } from "https://raw.githubusercontent.com/dyedgreen/deno-sqlite/refs/heads/master/mod.ts";
 import { GhostType, MexpGhost, MexpPosition, MexpUser } from "./user.ts";
 import { now, shortenName } from "./utils.ts";
-import { config } from "./config.ts";
+import { gameConfig } from "./config.ts";
 
 export async function getDB() {
     const db = new DB("./db.sqlite");
@@ -34,7 +34,7 @@ export function getPlayer(username: string, dontCreate:boolean, getGhost:boolean
         if (final.pass != pass && pass != "") return null;
         return final;
     } else {
-        if (!config.accountCreation || dontCreate || username.length == 5)
+        if (!gameConfig.accountCreation || dontCreate || username.length == 5)
         {
             return null;
         }

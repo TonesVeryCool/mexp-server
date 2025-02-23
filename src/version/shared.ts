@@ -1,4 +1,4 @@
-import { config, speakConfig, tokenMapping } from "../config.ts";
+import { serverConfig, gameConfig, speakConfig, tokenMapping } from "../config.ts";
 import { getAllGhosts, getPlayer } from "../db.ts";
 import { shared } from "../shared.ts";
 import { chatMessages, indexesToText, SpeakMessage } from "../speak.ts";
@@ -15,7 +15,7 @@ export const version_mexp = async () => {
 }
 
 export const mexp_allowed = () => {
-    return new Response(config.allowed ? "1" : "0", {
+    return new Response(gameConfig.allowed ? "1" : "0", {
         headers: {
             "content-type": "application/octet-stream",
         }
@@ -23,7 +23,7 @@ export const mexp_allowed = () => {
 }
 
 export const mexp_version = () => {
-    return new Response(config.version.toString(), {
+    return new Response(gameConfig.version.toString(), {
         headers: {
             "content-type": "application/octet-stream",
         }
@@ -31,7 +31,7 @@ export const mexp_version = () => {
 }
 
 export const m_dl = () => {
-    return new Response(config.data);
+    return new Response(serverConfig.data);
 }
 
 export const m_vi = (req:Request, me:string, au:boolean) => {
@@ -40,14 +40,14 @@ export const m_vi = (req:Request, me:string, au:boolean) => {
         return new Response("0");
     }
     
-    if (vs != config.version.toString()) {
+    if (vs != gameConfig.version.toString()) {
         return new Response("");
     }
 
     let accountsAllowed = true;
 
-    if (config.version >= 36 && !au) accountsAllowed = false;
-    if (!config.accountCreation) accountsAllowed = false;
+    if (gameConfig.version >= 36 && !au) accountsAllowed = false;
+    if (!gameConfig.accountCreation) accountsAllowed = false;
     
     const player:MexpUser|null = getPlayer(me, !accountsAllowed, false);
     if (!player) return new Response("");
@@ -97,7 +97,7 @@ export const m_gm = async (req:Request, user:MexpUser|null, session:MexpSession|
     
     try {
         const tokens = user.legitTokens.split(" ");
-        if (!hasAllTokens(map, tokens) && config.validateMaps && !au) {
+        if (!hasAllTokens(map, tokens) && gameConfig.validateMaps && !au) {
             if (user.lastSpawnData != `${map} ${spawnData}`) throw new Deno.errors.NotFound("Was the map found? I don't know, the user doesn't have access to it!");
         }
         await Deno.lstat(`./assets/maps/${map}.assetBundle`)
@@ -110,7 +110,7 @@ export const m_gm = async (req:Request, user:MexpUser|null, session:MexpSession|
         spawnData = "0 0.9 0 0";
     }
     
-    if (map == "map_ballpit_cave" && randf_range(0.0, 100.0) >= (100 - (config.ballpitAltChance ?? 2))) {
+    if (map == "map_ballpit_cave" && randf_range(0.0, 100.0) >= (100 - (gameConfig.ballpitAltChance ?? 2))) {
         session.legitBallpitAlt = true;
         map = "map_ballpit_alt";
     }
@@ -200,7 +200,7 @@ export const m_sg = (req:Request, user:MexpUser|null, me:string) => {
         serverConsoleLog(`${spawnData}`);
     }
     
-    return new Response(config.version < 35 ? "check" : "1");
+    return new Response(gameConfig.version < 35 ? "check" : "1");
 }
 
 export const m_pc = (user:MexpUser|null) => {
@@ -215,13 +215,13 @@ export const m_cp = (req:Request, user:MexpUser|null, me:string) => {
     const va = req.headers.get("va") ?? "";
     
     if (pa == "ts") {
-        if (config.validateMaps && user.ghost.scene != "map_theater_employee") return new Response("");
+        if (gameConfig.validateMaps && user.ghost.scene != "map_theater_employee") return new Response("");
         
         shared.isScreenOn = !shared.isScreenOn;
         serverLog(`${shortenName(me)} turned the screen ${shared.isScreenOn ? "on" : "off"}.`);
     }
     
-    return new Response(config.version < 35 ? "check" : "1");
+    return new Response(gameConfig.version < 35 ? "check" : "1");
 }
 
 export const m_gs = (user:MexpUser|null) => {
@@ -268,7 +268,7 @@ export const m_ss = async (req:Request, user:MexpUser|null) => {
         chatMessages.shift();
     }
     
-    return new Response(config.version < 35 ? "check" : "1");
+    return new Response(gameConfig.version < 35 ? "check" : "1");
 }
 
 export const m_st = (req:Request, user:MexpUser|null, session:MexpSession|null, me:string, au:boolean) => {
@@ -278,12 +278,12 @@ export const m_st = (req:Request, user:MexpUser|null, session:MexpSession|null, 
     const tk = req.headers.get("tk") ?? "cave";
     const map = user.ghost.scene;
     
-    if (!config.allTokens.includes(tk)) {
+    if (!gameConfig.allTokens.includes(tk)) {
         return new Response("");
     }
     
     try {
-        if ((tokenMapping[tk] != map || (tk == "underground_part2" && !session.legitBallpitAlt)) && config.validateTokens && !au) {
+        if ((tokenMapping[tk] != map || (tk == "underground_part2" && !session.legitBallpitAlt)) && gameConfig.validateTokens && !au) {
             user.cheatTokens += ` ${tk}`;
             user.cheatTokens = user.cheatTokens.trimStart();
             user.commit();
@@ -303,7 +303,7 @@ export const m_st = (req:Request, user:MexpUser|null, session:MexpSession|null, 
         // TODO: what is meant to happen if an error occurs?
     }
     
-    return new Response(config.version < 35 ? "check" : "1");
+    return new Response(gameConfig.version < 35 ? "check" : "1");
 }
 
 export const m_im = async (user:MexpUser|null, me:string) => {

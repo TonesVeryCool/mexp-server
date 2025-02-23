@@ -2,7 +2,7 @@ import { Row } from "https://raw.githubusercontent.com/dyedgreen/deno-sqlite/ref
 import { db, getGhost, getPlayer } from "./db.ts";
 import { now, serverLog, shortenName } from "./utils.ts";
 import { lastMessageFrom } from "./speak.ts";
-import { config } from "./config.ts";
+import { gameConfig } from "./config.ts";
 import { canBeFloat } from "./utils.ts";
 
 export const sessions:MexpSession[] = [];
@@ -156,7 +156,7 @@ export class MexpGhost {
         if (this.type == GhostType.Classic && lastPlayed != -1)
         {
             if (now() - lastPlayed >= 1209600 /* 2 weeks */) {
-                if (now() - lastPlayed >= 21038400 /* 8 months */ && config.version >= 37) {
+                if (now() - lastPlayed >= 21038400 /* 8 months */ && gameConfig.version >= 37) {
                     this.type = GhostType.Gone;
                 } else {
                     this.type = GhostType.Inactive;
@@ -164,7 +164,7 @@ export class MexpGhost {
             }
         }
 
-        if (this.type == GhostType.It && config.version < 29) this.type = GhostType.Classic;
+        if (this.type == GhostType.It && gameConfig.version < 29) this.type = GhostType.Classic;
     }
 
     public str(): string {

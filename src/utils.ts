@@ -1,4 +1,4 @@
-import { config, ghostMixing, mapTokens, tokenMapping, webhookConfig } from "./config.ts";
+import { serverConfig, gameConfig, ghostMixing, mapTokens, tokenMapping, webhookConfig } from "./config.ts";
 import { MexpSession, MexpUser } from "./user.ts";
 
 // deno-lint-ignore no-explicit-any
@@ -98,7 +98,7 @@ export function isAuthorized(req:Request): boolean {
     const ed:string = req.headers.get("ed") ?? "0";
     const au:string = req.headers.get("au") ?? "something";
     
-    if (ed == "1" && au == config.authorizerText) return true;
+    if (ed == "1" && au == gameConfig.authorizerHash) return true;
     
     return false;
 }
@@ -112,7 +112,7 @@ export function adminConsoleLog(log:string) {
 }
 
 export function serverLog(log:string, disableIfHasEdit:boolean = true) {
-    if (config.extraLogging) console.log(log);
+    if (serverConfig.extraLogging) console.log(log);
     
     if (webhookConfig.url) {
         if (disableIfHasEdit && log.includes("_edit")) return;
@@ -134,7 +134,7 @@ export function serverLog(log:string, disableIfHasEdit:boolean = true) {
 
 function hasTokenForMap(map:string, tokens:string[]): boolean {
     try {
-        if (mapTokens[map] == '' || tokens.includes(mapTokens[map]) || !config.validateMaps) return true;
+        if (mapTokens[map] == '' || tokens.includes(mapTokens[map]) || !gameConfig.validateMaps) return true;
         return false;
     } catch (_ex) {
         return false;
@@ -143,7 +143,7 @@ function hasTokenForMap(map:string, tokens:string[]): boolean {
 
 export function hasAllTokens(map:string, tokens:string[]): boolean {
     try {
-        if (!config.validateMaps) return true;
+        if (!gameConfig.validateMaps) return true;
 
         const tokenForMap = mapTokens[map];
         if (tokenForMap == '') return true;

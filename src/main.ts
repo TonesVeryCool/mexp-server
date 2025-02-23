@@ -1,5 +1,5 @@
 import { encode, isAuthorized, RoutingInfo, validateUsername } from "./utils.ts";
-import { config, httpsConfig } from "./config.ts";
+import { serverConfig, gameConfig, httpsConfig } from "./config.ts";
 import { doRouting as post29Router } from "./version/post29.ts";
 import { doRouting as v28Router } from "./version/28.ts";
 import { doRouting as pre28Router } from "./version/pre28.ts";
@@ -10,8 +10,8 @@ import { terminalApp } from "./term.ts";
 if (import.meta.main) {
   const usesHttps = (httpsConfig.fullchain && httpsConfig.privkey);
   const settings = usesHttps ?
-  {port: config.port, cert: await Deno.readTextFile(httpsConfig.fullchain), key: await Deno.readTextFile(httpsConfig.privkey)} : 
-  {port: config.port};
+  {port: serverConfig.port, cert: await Deno.readTextFile(httpsConfig.fullchain), key: await Deno.readTextFile(httpsConfig.privkey)} : 
+  {port: serverConfig.port};
 
   Deno.serve(settings, async (req: Request) => {
     const url = new URL(req.url);
@@ -26,16 +26,16 @@ if (import.meta.main) {
     let user:MexpUser|null = null;
     let au:boolean = false;
     
-    if (me != "" && path != (config.version == 28 ? "/m/u/vi" : config.version < 28 ? "/m/vi" : "/m/u/v") && !(config.version >= 36 && me == "none" && (path == "/m/m/c" || path == "/m/u/c"))) {
+    if (me != "" && path != (gameConfig.version == 28 ? "/m/u/vi" : gameConfig.version < 28 ? "/m/vi" : "/m/u/v") && !(gameConfig.version >= 36 && me == "none" && (path == "/m/m/c" || path == "/m/u/c"))) {
       session = getSession(me);
       if (!session) {
-        if (config.extraLogging) console.log(`Session for user ${me} doesn't exist!`);
+        if (serverConfig.extraLogging) console.log(`Session for user ${me} doesn't exist!`);
         return new Response("");
       }
       
       user = session.getUser();
       if (!user) {
-        if (config.extraLogging) console.log(`User for session ${me} doesn't exist!`);
+        if (serverConfig.extraLogging) console.log(`User for session ${me} doesn't exist!`);
         return new Response("");
       }
     
@@ -58,25 +58,25 @@ if (import.meta.main) {
     }
 
     if (path == "/anymozu5/me/main/host") {
-      const port = config.port == 80 || config.port == 443 ? '': `:${config.port}`;
-      return new Response(encode(config.redirectUrl == "" ? `${config.scheme}://${config.ip}${port}/` : config.redirectUrl));
+      const port = serverConfig.port == 80 || serverConfig.port == 443 ? '': `:${serverConfig.port}`;
+      return new Response(encode(serverConfig.redirectUrl == "" ? `${serverConfig.scheme}://${serverConfig.ip}${port}/` : serverConfig.redirectUrl));
     }
 
     if (path == "/version/mexp") {
       return await version_mexp();
     }
 
-    if (config.version >= 29) {
+    if (gameConfig.version >= 29) {
       const response = await post29Router(routingInfo);
       if (response) return response;
     }
 
-    if (config.version == 28) {
+    if (gameConfig.version == 28) {
       const response = await v28Router(routingInfo);
       if (response) return response;
     }
 
-    if (config.version < 28) {
+    if (gameConfig.version < 28) {
       const response = await pre28Router(routingInfo);
       if (response) return response;
     }

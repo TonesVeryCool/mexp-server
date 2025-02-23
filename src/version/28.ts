@@ -1,5 +1,5 @@
 import { RoutingInfo} from "../utils.ts";
-import { config } from "../config.ts";
+import { serverConfig } from "../config.ts";
 import { MexpSession, MexpUser } from "../user.ts";
 import { m_cp, m_dl, m_ga, m_gg, m_gm, m_gn, m_gs, m_gt, m_im, m_pc, m_sd, m_sg, m_ss, m_st, m_tv, m_vi, m_wl, mexp_allowed, mexp_version } from "./shared.ts";
 
@@ -13,10 +13,10 @@ export async function doRouting(info:RoutingInfo) {
 
   switch (path)
   {
-    case `/${config.data}/allowed`: {
+    case `/${serverConfig.data}/allowed`: {
       return mexp_allowed();
     }
-    case `/${config.data}/version`: {
+    case `/${serverConfig.data}/version`: {
       return mexp_version();
     }
     case "/m/dl": {

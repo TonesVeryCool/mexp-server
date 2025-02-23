@@ -107,6 +107,10 @@ export function serverConsoleLog(log:string) {
     console.log(`%cserver  | %c${log}`, "color: green", "");
 }
 
+export function adminConsoleLog(log:string) {
+    console.log(`%cadmin   | %c${log}`, "color: yellow", "");
+}
+
 export function serverLog(log:string, disableIfHasEdit:boolean = true) {
     if (config.extraLogging) console.log(log);
     
@@ -183,7 +187,7 @@ export function timeSinceLastOnline(lastOnline:number) {
         if (lastOnline >= unit.seconds) {
             let value = Math.round(lastOnline / unit.seconds);
             if (unit.name == "month" && value > 12) value = 12;
-            
+
             return `${value} ${unit.name}${value !== 1 ? 's' : ''} ago`;
         }
     }

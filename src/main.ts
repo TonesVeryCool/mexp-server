@@ -5,6 +5,7 @@ import { doRouting as v28Router } from "./version/28.ts";
 import { doRouting as pre28Router } from "./version/pre28.ts";
 import { getSession, MexpSession, MexpUser } from "./user.ts";
 import { version_mexp } from "./version/shared.ts";
+import { terminalApp } from "./term.ts";
 
 if (import.meta.main) {
   const usesHttps = (httpsConfig.fullchain && httpsConfig.privkey);
@@ -84,5 +85,7 @@ if (import.meta.main) {
     console.log(path);
     console.log(req.headers);
     return new Response("404");
-  })
+  });
+
+  terminalApp();
 }

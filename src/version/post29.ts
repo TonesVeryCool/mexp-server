@@ -99,7 +99,10 @@ export async function doRouting(info:RoutingInfo) {
       
       const lastOnline = now() - targetUser.lastPlayed;
       
-      return new Response(`${target}\n${finalMsg}\n${timeSinceLastOnline(lastOnline)}\n${targetUser.legitTokens.split(" ").join(", ")}`);
+      const tokensSplit = targetUser.legitTokens.split(" ").join(", ")
+      const tokens = tokensSplit.length == 0 ? "(none)" : tokensSplit;
+      
+      return new Response(`${target}\n${finalMsg}\n${timeSinceLastOnline(lastOnline)}\n${tokens}`);
     }
     case "/m/u/g": {
       return m_sg(req, user, me);

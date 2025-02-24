@@ -24,7 +24,12 @@ export class MexpSession {
         this.inactivityTimer = setTimeout(() => {
             const index = sessions.indexOf(this);
             if (index > -1) sessions.splice(index, 1);
-            serverLog(`see you soon, ${shortenName(this.username)}.`);
+            
+            if (gameConfig.version < 25) {
+                serverLog(`there is no activity.`);
+            } else {
+                serverLog(`see you soon, ${shortenName(this.username)}.`);
+            }
         }, 1000 * 60);
     }
 

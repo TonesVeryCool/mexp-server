@@ -60,7 +60,11 @@ export const m_vi = (req:Request, me:string, au:boolean) => {
         const session:MexpSession = new MexpSession();
         session.username = me;
         
-        serverLog(`welcome, ${shortenName(me)}.`);
+        if (gameConfig.version < 25) { // the change happened between 24 and 25, but i can't make it work like that easily, so it just does this in 24 and below
+            serverLog(`there is activity.`);
+        } else {
+            serverLog(`welcome, ${shortenName(me)}.`);
+        }
         
         sessions.push(session);
     }
@@ -294,7 +298,11 @@ export const m_st = (req:Request, user:MexpUser|null, session:MexpSession|null, 
             
             if (cheatedTokens.includes(tk)) return new Response("");
             
-            serverLog(`${shortenName(me)} got a token: \`${tk}\``);
+            if (gameConfig.version < 30) {
+                serverLog(`${shortenName(me)} got a token.`);
+            } else {
+                serverLog(`${shortenName(me)} got a token: \`${tk}\``);
+            }
             user.legitTokens += ` ${tk}`;
             user.legitTokens = user.legitTokens.trimStart();
             user.commit();

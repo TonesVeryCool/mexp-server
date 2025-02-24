@@ -115,7 +115,7 @@ export function serverLog(log:string, disableIfHasEdit:boolean = true) {
     if (serverConfig.extraLogging) console.log(log);
     
     if (webhookConfig.url) {
-        if (disableIfHasEdit && log.includes("_edit")) return;
+        if ((disableIfHasEdit && gameConfig.version != 24) && log.includes("_edit")) return;
 
         const payload = {
             content: log,

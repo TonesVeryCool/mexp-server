@@ -1,3 +1,5 @@
+import { gameConfig } from "./config.ts";
+
 export class SpeakMessage {
     username:string = "_edit";
     message:string = "hello world ";
@@ -50,7 +52,8 @@ export async function indexesToText(str:string[]) {
         }
     }
 
-    return final.trim();
+    if (gameConfig.version < 30) final += " "; // not actually how pre-30 mexp did it, but my speak implementation is superior and it doesn't have the stupid bug so i have to do it like this
+    return final.trimStart();
 }
 
 export const lastMessageFrom = (me:string) => chatMessages.findLast(msg => msg.username === me)?.message.split(" ").join("@") ?? "";

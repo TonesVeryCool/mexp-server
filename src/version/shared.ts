@@ -200,6 +200,9 @@ export const m_sg = (req:Request, user:MexpUser|null, me:string) => {
         }
 
         user.ghost.position = MexpPosition.fromString(spawnData);
+        user.lastPlayed = now();
+        
+        user.commit();
         user.ghost.commit();
         
         serverConsoleLog(`${me}`);

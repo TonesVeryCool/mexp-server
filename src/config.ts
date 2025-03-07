@@ -8,7 +8,7 @@ export const serverConfig = {
 }
 
 export const gameConfig = {
-    'version': 29,
+    'version': 37,
     'allowed': true,
     'accountCreation': true,
     'authorizerHash': 'the hash128 of authorizer.txt here',

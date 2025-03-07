@@ -222,7 +222,7 @@ export const m_cp = (req:Request, user:MexpUser|null, me:string) => {
         if (gameConfig.validateMaps && user.ghost.scene != "map_theater_employee") return new Response("");
         
         shared.isScreenOn = !shared.isScreenOn;
-        serverLog(`${shortenName(me)} turned the screen ${shared.isScreenOn ? "on" : "off"}.`);
+        serverLog(`${shortenName(me)} turned the screen ${shared.isScreenOn ? "on" : "off"}.`, false);
     }
     
     return new Response(gameConfig.version < 35 ? "check" : "1");

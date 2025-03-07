@@ -44,6 +44,8 @@ export const m_vi = (req:Request, me:string, au:boolean) => {
         return new Response("");
     }
 
+    if (!gameConfig.allowed) return new Response("0");
+
     let accountsAllowed = true;
 
     if (gameConfig.version >= 36 && !au) accountsAllowed = false;

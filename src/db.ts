@@ -1,6 +1,6 @@
 import { DB } from "https://raw.githubusercontent.com/dyedgreen/deno-sqlite/refs/heads/master/mod.ts";
 import { GhostType, MexpGhost, MexpPosition, MexpUser } from "./user.ts";
-import { now, shortenName } from "./utils.ts";
+import { shortenName } from "./utils.ts";
 import { gameConfig } from "./config.ts";
 
 export async function getDB() {

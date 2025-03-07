@@ -175,6 +175,7 @@ export const canBeFloat = (value: string): boolean => {
 export function timeSinceLastOnline(lastOnline:number) {
     const units = [
         { name: "decade", seconds: 315576000 },
+        { name: "year", seconds: 31536000 },
         { name: "month", seconds: 2629800 },
         { name: "week", seconds: 604800 },
         { name: "day", seconds: 86400 },
@@ -183,13 +184,18 @@ export function timeSinceLastOnline(lastOnline:number) {
         { name: "second", seconds: 1 }
     ];
 
+    let i = 0;
     for (const unit of units) {
-        if (lastOnline >= unit.seconds) {
+        if (lastOnline / (unit.seconds * 2) >= 1) {
+            const nextUnit = units[i - 1];
             let value = Math.round(lastOnline / unit.seconds);
-            if (unit.name == "month" && value > 12) value = 12;
+            if (nextUnit != undefined && value > (nextUnit.seconds / unit.seconds)) {
+                value = Math.ceil(nextUnit.seconds / unit.seconds)
+            }
 
             return `${value} ${unit.name}${value !== 1 ? 's' : ''} ago`;
         }
+        ++i;
     }
 
     return "just now";

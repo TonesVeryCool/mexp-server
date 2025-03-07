@@ -105,7 +105,7 @@ function createPlayer(username: string) {
     user.ghost.position.r = 0;
 
     user.ghost.scene = "map_welcome";
-    user.lastPlayed = now();
+    user.lastPlayed = 0;
 
     user.commit();
     user.ghost.commit();

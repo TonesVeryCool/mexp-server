@@ -1,4 +1,4 @@
-import { getAllPaths, now, randomLetters, RoutingInfo, serverConsoleLog, shortenName, timeSinceLastOnline } from "../utils.ts";
+import { getAllPaths, now, randomLetters, RoutingInfo, serverConsoleLog, serverLog, shortenName, timeSinceLastOnline } from "../utils.ts";
 import { getPlayer } from "../db.ts";
 import { serverConfig, gameConfig } from "../config.ts";
 import { MexpSession, MexpUser } from "../user.ts";
@@ -50,6 +50,8 @@ export async function doRouting(info:RoutingInfo) {
             if (!player) {
               return new Response("0");
             }
+
+            serverLog(`new user: ${player.username}`, false);
             
             return new Response(newMe);
           }

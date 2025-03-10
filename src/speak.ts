@@ -14,6 +14,8 @@ export async function indexesToText(str:string[]) {
 
     let lastWord = "";
     let linkAmount = 0;
+    let i = 0;
+
     for (const idxString of str) {
         try {
             const idxNumber = Number.parseInt(idxString);
@@ -29,9 +31,9 @@ export async function indexesToText(str:string[]) {
                 if (word != lastWord) {
                     linkAmount = 0;
                 }
-                if (word == "s" || word == "ing" || word == "ed" || word == "d" || word == "." || word == "," || word == ":" || word == "!" || word == "?" || word == "'s" || word == "'ll" || word == "ly" || (lastWord == "un" && (word == "follow")))
+                if (word == "s" || word == "ing" || word == "ed" || word == "d" || word == "." || word == "," || word == ":" || lastWord == ":" || word == "!" || word == "?" || word == "'s" || word == "'ll" || word == "ly" || (lastWord == "un" && i > 1))
                 {
-                    if (linkAmount == 2 && (word == "s" || word == "ed" || word == "d")) {
+                    if (linkAmount == 2 && (word == "s" || word == "ed" || word == "d" || word == "un")) {
                         final += ` ${word}`;
                         linkAmount = 1;
                     } else {
@@ -42,7 +44,7 @@ export async function indexesToText(str:string[]) {
                 else
                 {
                     final += ` ${word}`;
-                    linkAmount = 0;
+                    linkAmount = (lastWord == "un" ? 1 : 0);
                 }
                 lastWord = word;
             }
@@ -50,6 +52,7 @@ export async function indexesToText(str:string[]) {
             final += " ";
             lastWord = "";
         }
+        ++i;
     }
 
     if (gameConfig.version < 30) final += " "; // not actually how pre-30 mexp did it, but my speak implementation is superior and it doesn't have the stupid bug so i have to do it like this

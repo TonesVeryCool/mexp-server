@@ -22,6 +22,7 @@ Deno.test("speak accuracy - string mixing - s/d/ed", async () => {
     assertEquals(await outputFromString("s s s s s"), "ss ss s");
     assertEquals(await outputFromString("d d d d d"), "dd dd d");
     assertEquals(await outputFromString("ed ed ed ed ed"), "eded eded ed");
+    assertEquals(await outputFromString("a 0 d"), "a 0d");
 })
 
 Deno.test("speak accuracy - string mixing - ing/'s/'ll/ly", async () => {

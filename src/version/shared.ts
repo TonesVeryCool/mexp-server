@@ -214,7 +214,7 @@ export const m_sg = (req:Request, user:MexpUser|null, me:string) => {
 
 export const m_pc = (user:MexpUser|null) => {
     if (!user) return new Response("");
-    return new Response(sessions.length.toString());
+    return new Response(sessions.filter(value => value.username != "_edit").length.toString());
 }
 
 export const m_cp = (req:Request, user:MexpUser|null, me:string) => {

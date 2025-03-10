@@ -8,7 +8,7 @@ import { canBeFloat } from "./utils.ts";
 export const sessions:MexpSession[] = [];
 
 export class MexpSession {
-    username:string = "_editor";
+    username:string = "_edit";
     inactivityTimer:number = 0;
     mapChangeTimer:number = 0;
 

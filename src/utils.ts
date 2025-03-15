@@ -1,5 +1,6 @@
 import { serverConfig, gameConfig, ghostMixing, mapTokens, tokenMapping, webhookConfig } from "./config.ts";
 import { MexpSession, MexpUser } from "./user.ts";
+import * as path from "jsr:@std/path";
 
 // deno-lint-ignore no-explicit-any
 const flip = (data: any) => Object.fromEntries(Object.entries(data).map(([key, value]) => [value, key]));
@@ -60,12 +61,12 @@ export function encode(str: string): string
     return realStr
 }
 
-export async function getAllPaths(folderPath: string): Promise<string[]> {
+export async function getAllPaths(folderPath: string, includePath:boolean = false): Promise<string[]> {
     const filePaths: string[] = [];
     
     for await (const entry of Deno.readDir(folderPath)) {
         if (entry.isFile) {
-            filePaths.push(entry.name);
+            filePaths.push(includePath ? path.join(path.resolve(folderPath), entry.name) : entry.name);
         }
     }
 

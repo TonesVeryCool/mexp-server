@@ -245,7 +245,7 @@ export const m_gs = (user:MexpUser|null) => {
     let final:string = "";
     
     for (const message of chatMessages) {
-        final += `${message.username}: ${message.message}\n`;
+        final += message.username == "" ? `${message.message}\n` : `${message.username}: ${message.message}\n`;
     }
     
     final = final.substring(0, final.length - 1);

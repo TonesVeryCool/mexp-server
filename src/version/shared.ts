@@ -117,6 +117,7 @@ export const m_gm = async (req:Request, user:MexpUser|null, session:MexpSession|
         
         map = "map_void";
         spawnData = "0 0.9 0 0";
+        serverConsoleLog(`sending to void because: ${err.message}`);
     }
     
     if (map == "map_ballpit_cave" && randf_range(0.0, 100.0) >= (100 - (gameConfig.ballpitAltChance ?? 2))) {

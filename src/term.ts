@@ -6,6 +6,7 @@ import { execute as ban } from "./commands/ban.ts";
 import { execute as unban } from "./commands/unban.ts";
 import { execute as tp } from "./commands/tp.ts";
 import { execute as reload } from "./commands/reload.ts";
+import { execute as tk } from "./commands/tk.ts";
 import { adminConsoleLog } from "./utils.ts";
 
 export class TermState {
@@ -56,6 +57,11 @@ export async function terminalApp() {
             }
             case "reload": {
                 await reload(args);
+                break;
+            }
+            case "givetoken":
+            case "tk": {
+                tk(args);
                 break;
             }
         }

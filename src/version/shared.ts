@@ -1,6 +1,7 @@
 import { serverConfig, gameConfig, speakConfig, tokenMapping } from "../config.ts";
 import { getAllGhosts, getPlayer } from "../db.ts";
-import { shared } from "../shared.ts";
+import { EventType } from "../event_emitter.ts";
+import { shared, sharedEvents } from "../shared.ts";
 import { chatMessages, indexesToText, SpeakMessage } from "../speak.ts";
 import { hasSession, MexpGhost, MexpPosition, MexpSession, MexpUser, sessions } from "../user.ts";
 import { getRandomFilePath, hasAllTokens, mixingForMap, now, randf_range, serverConsoleLog, serverLog, shortenName, validateUsername } from "../utils.ts";
@@ -61,6 +62,8 @@ export const m_vi = (req:Request, me:string, au:boolean) => {
     if (!hasSession(me)) {
         const session:MexpSession = new MexpSession();
         session.username = me;
+
+        sharedEvents.emit(EventType.SessionStarted, player, session);
         
         if (gameConfig.version < 25) { // the change happened between 24 and 25, but i can't make it work like that easily, so it just does this in 24 and below
             serverLog(`there is activity.`);
@@ -142,6 +145,8 @@ export const m_gm = async (req:Request, user:MexpUser|null, session:MexpSession|
     user.ghost.position = MexpPosition.fromString(spawnData);
     user.lastSpawnData = `${map} ${spawnData}`;
 
+    sharedEvents.emit(EventType.MapLoaded, user, map, user.ghost.position);
+
     user.commit();
     user.ghost.commit();
     
@@ -202,6 +207,8 @@ export const m_sg = (req:Request, user:MexpUser|null, me:string) => {
         user.ghost.position = MexpPosition.fromString(spawnData);
         user.lastPlayed = now();
         
+        sharedEvents.emit(EventType.GhostMoved, user, user.ghost.position);
+
         user.commit();
         user.ghost.commit();
         
@@ -226,6 +233,7 @@ export const m_cp = (req:Request, user:MexpUser|null, me:string) => {
     if (pa == "ts") {
         if (gameConfig.validateMaps && user.ghost.scene != "map_theater_employee") return new Response("");
         
+        sharedEvents.emit(EventType.ScreenToggled, user, !shared.isScreenOn);
         shared.isScreenOn = !shared.isScreenOn;
         if (gameConfig.version < 25) {
             serverLog(`the screen is ${shared.isScreenOn ? "on" : "off"}.`, false);
@@ -276,6 +284,8 @@ export const m_ss = async (req:Request, user:MexpUser|null) => {
     if (!speakConfig.speakEnabled) return new Response("0");
 
     chatMessages.push(chatMessage);
+
+    sharedEvents.emit(EventType.SpeakMessage, user, final.trimEnd());
     
     if (chatMessages.length > 25) {
         chatMessages.shift();
@@ -297,6 +307,8 @@ export const m_st = (req:Request, user:MexpUser|null, session:MexpSession|null, 
     
     try {
         if ((tokenMapping[tk] != map || (tk == "underground_part2" && !session.legitBallpitAlt)) && gameConfig.validateTokens && !au) {
+            sharedEvents.emit(EventType.TokenObtained, user, false, tk);
+
             user.cheatTokens += ` ${tk}`;
             user.cheatTokens = user.cheatTokens.trimStart();
             user.commit();
@@ -306,6 +318,8 @@ export const m_st = (req:Request, user:MexpUser|null, session:MexpSession|null, 
             const cheatedTokens = user.cheatTokens.split(" ");
             
             if (cheatedTokens.includes(tk)) return new Response("");
+
+            sharedEvents.emit(EventType.TokenObtained, user, true, tk);
             
             if (gameConfig.version < 30) {
                 serverLog(`${shortenName(me)} got a token.`);
@@ -330,6 +344,8 @@ export const m_im = async (user:MexpUser|null, me:string) => {
     
     serverConsoleLog(`${me}`);
     serverConsoleLog(`sending ${path}`);
+
+    sharedEvents.emit(EventType.ImageRequested, user, path);
     
     return new Response(await Deno.readFile(`./assets/images/${path}`), {
         status: 200,
@@ -347,6 +363,8 @@ export const m_tv = async (user:MexpUser|null, me:string) => {
     
     serverConsoleLog(`${me}`);
     serverConsoleLog(`sending ${path}`);
+
+    sharedEvents.emit(EventType.VideoRequested, user, path);
     
     return new Response(await Deno.readFile(`./assets/videos/${path}`), {
         status: 200,

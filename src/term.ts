@@ -5,6 +5,7 @@ import { execute as desel } from "./commands/desel.ts";
 import { execute as ban } from "./commands/ban.ts";
 import { execute as unban } from "./commands/unban.ts";
 import { execute as tp } from "./commands/tp.ts";
+import { execute as reload } from "./commands/reload.ts";
 import { adminConsoleLog } from "./utils.ts";
 
 export class TermState {
@@ -51,6 +52,10 @@ export async function terminalApp() {
             }
             case "tp": {
                 tp(args);
+                break;
+            }
+            case "reload": {
+                await reload(args);
                 break;
             }
         }

@@ -4,6 +4,8 @@ import { now, serverLog, shortenName } from "./utils.ts";
 import { lastMessageFrom } from "./speak.ts";
 import { gameConfig } from "./config.ts";
 import { canBeFloat } from "./utils.ts";
+import { sharedEvents } from "./shared.ts";
+import { EventType } from "./event_emitter.ts";
 
 export const sessions:MexpSession[] = [];
 
@@ -25,6 +27,7 @@ export class MexpSession {
             const index = sessions.indexOf(this);
             if (index > -1) sessions.splice(index, 1);
             
+            sharedEvents.emit(EventType.SessionDisconnected, this);
             if (gameConfig.version < 25) {
                 serverLog(`there is no activity.`);
             } else {

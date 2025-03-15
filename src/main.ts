@@ -6,8 +6,13 @@ import { doRouting as pre28Router } from "./version/pre28.ts";
 import { getSession, MexpSession, MexpUser } from "./user.ts";
 import { version_mexp } from "./version/shared.ts";
 import { terminalApp } from "./term.ts";
+import { pluginManager } from "./shared.ts";
 
 if (import.meta.main) {
+  console.log("loading plugins...")
+
+  await pluginManager.loadPlugins();
+
   const usesHttps = (httpsConfig.fullchain && httpsConfig.privkey);
   const settings = usesHttps ?
   {port: serverConfig.port, cert: await Deno.readTextFile(httpsConfig.fullchain), key: await Deno.readTextFile(httpsConfig.privkey)} : 

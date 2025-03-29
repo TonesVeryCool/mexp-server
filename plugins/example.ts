@@ -50,6 +50,12 @@ const examplePlugin:Plugin = {
                 PluginUtils.speak("SYSTEM", `welcome ${user.username} to HELL...`);
             }
         });
+
+        PluginUtils.hook(this, EventType.UnknownCustomPacket, (user:MexpUser, packet:string, variables:string) => {
+            if (packet == "test") {
+                PluginUtils.speak("SYSTEM", `${user.username} sent test packet with vars: "${variables}"`);
+            }
+        });
     }
 }
 

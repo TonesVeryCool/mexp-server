@@ -228,7 +228,6 @@ export const m_pc = (user:MexpUser|null) => {
 export const m_cp = (req:Request, user:MexpUser|null, me:string) => {
     if (!user) return new Response("");
     const pa = req.headers.get("pa") ?? "none";
-    // deno-lint-ignore no-unused-vars
     const va = req.headers.get("va") ?? "";
     
     if (pa == "ts") {
@@ -241,6 +240,8 @@ export const m_cp = (req:Request, user:MexpUser|null, me:string) => {
         } else {
             serverLog(`${shortenName(me)} turned the screen ${shared.isScreenOn ? "on" : "off"}.`, false);
         }
+    } else {
+        sharedEvents.emit(EventType.UnknownCustomPacket, user, pa, va)
     }
     
     return new Response(gameConfig.version < 35 ? "check" : "1");

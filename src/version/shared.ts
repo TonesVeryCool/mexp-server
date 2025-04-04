@@ -135,7 +135,11 @@ export const m_gm = async (req:Request, user:MexpUser|null, session:MexpSession|
     }
     
     if (map == "map_maze") {
-        session.doMapTimer("map_void");
+        if (gameConfig.version > 24) {
+            session.doMapTimer("map_hell");
+        } else {
+            session.doMapTimer("map_welcome");
+        }
     }
 
     if (!MexpPosition.testString(spawnData)) {

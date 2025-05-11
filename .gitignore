@@ -130,4 +130,4 @@ dist
 .pnp.*
 
 # Server stuff
-db.sqlite
+*.sqlite

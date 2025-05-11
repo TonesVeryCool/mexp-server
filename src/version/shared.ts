@@ -45,7 +45,7 @@ export const m_vi = (req:Request, me:string, au:boolean) => {
         return new Response("");
     }
 
-    if (!gameConfig.allowed) return new Response("0");
+    if (!gameConfig.allowed) return new Response();
 
     let accountsAllowed = true;
 
@@ -206,7 +206,7 @@ export const m_sg = (req:Request, user:MexpUser|null, me:string) => {
 
     if (spawnData) {
         if (!MexpPosition.testString(spawnData)) {
-            return new Response("0");
+            return new Response();
         }
 
         user.ghost.position = MexpPosition.fromString(spawnData);
@@ -287,7 +287,7 @@ export const m_ss = async (req:Request, user:MexpUser|null) => {
     }
     serverConsoleLog(`${chatMessage.username} "${chatMessage.message}"`);
     
-    if (!speakConfig.speakEnabled) return new Response("0");
+    if (!speakConfig.speakEnabled) return new Response();
 
     chatMessages.push(chatMessage);
 

@@ -157,7 +157,7 @@ export const m_gm = async (req:Request, user:MexpUser|null, session:MexpSession|
     
     serverConsoleLog(`${me} ${map}`);
     
-    return new Response(await Deno.readFile(`./assets/maps/${map}.assetBundle`), {
+    return new Response(await Deno.readFile(`./assets/maps/${map}`), {
         status: 200,
         headers: {
             "content-type": "application/octet-stream; charset=binary",

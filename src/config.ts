@@ -66,6 +66,7 @@ export const mapTokens: Record<string, string> = {
     'map_welcome': '',
     'map_welcome_beach': '',
     'map_house': '',
+    'map_house_jukeroom': '',
     'map_hell': '',
     'map_void': '',
     'map_void_white': '',

@@ -7,6 +7,7 @@ import { getSession, MexpSession, MexpUser } from "./user.ts";
 import { version_mexp } from "./version/shared.ts";
 import { terminalApp } from "./term.ts";
 import { pluginManager } from "./shared.ts";
+import { getCounter } from "./counter.ts";
 
 if (import.meta.main) {
   console.log("loading plugins...")
@@ -23,6 +24,15 @@ if (import.meta.main) {
     let path = url.pathname;
     if (path.startsWith("//")) {
       path = path.substring(1);
+    }
+
+    if (path == "/counter") {
+      return new Response(await getCounter(), {
+        status: 200,
+        headers: {
+          "content-type": "image/png; charset=binary",
+        },
+      });
     }
     
     const me:string = req.headers.get("me") ?? "";

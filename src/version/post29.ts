@@ -102,7 +102,7 @@ export async function doRouting(info:RoutingInfo) {
       const lastOnline = now() - targetUser.lastPlayed;
       
       const tokensSplit = targetUser.legitTokens.split(" ").join(", ")
-      const tokens = gameConfig.version > 29 ? tokensSplit.length == 0 ? "" : tokensSplit : tokensSplit.length;
+      const tokens = gameConfig.version > 29 ? tokensSplit.length == 0 ? "(none)" : tokensSplit : tokensSplit.length;
       
       return new Response(`${target}\n${finalMsg}\n${timeSinceLastOnline(lastOnline)}\n${tokens}`);
     }

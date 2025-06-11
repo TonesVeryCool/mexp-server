@@ -80,7 +80,7 @@ export const mapTokens: Record<string, string> = {
     'map_cave': 'cave',
     'map_vip': 'vip',
 
-    'map_corporation': 'corporation',
+    'map_corporation_part1': 'corporation',
 
     'map_underground_part1': 'underground_part1',
     'map_underground_part2': 'underground_part2',

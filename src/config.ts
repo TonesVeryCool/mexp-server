@@ -88,8 +88,16 @@ export const mapTokens: Record<string, string> = {
     'map_theater': 'theater',
     'map_theater_employee': 'employee',
 
-    'map_station_disco': 'station_disco',
-    'map_station_break': 'station_disco',
+    'map_station_disco': 'station',
+    'map_station_break': 'station',
+    'map_station_check': 'station',
+    'map_station_four': 'station',
+    'map_station_gallery': 'station',
+    'map_station_hallway': 'station',
+    'map_station_low': 'station',
+    'map_station_prison': 'station',
+    'map_station_levers': 'employee',
+    'map_station_storage': 'employee',
 
     'map_museum_part0': 'youdontknowhowtoopendoors',
     'map_museum_part1': 'museum',

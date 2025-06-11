@@ -109,7 +109,7 @@ export const m_gm = async (req:Request, user:MexpUser|null, session:MexpSession|
         if (!hasAllTokens(map, tokens) && gameConfig.validateMaps && !au) {
             if (user.lastSpawnData != `${map} ${spawnData}`) throw new Deno.errors.NotFound("Was the map found? I don't know, the user doesn't have access to it!");
         }
-        await Deno.lstat(`./assets/maps/${map}.assetBundle`)
+        await Deno.lstat(`./assets/maps/${map}`)
     } catch (err) {
         if (!(err instanceof Deno.errors.NotFound)) {
             throw err;

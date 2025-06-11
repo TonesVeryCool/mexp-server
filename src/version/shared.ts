@@ -361,18 +361,20 @@ export const m_im = async (user:MexpUser|null, me:string) => {
     })
 }
 
-export const m_tv = async (user:MexpUser|null, me:string) => {
+export const m_tv = async (user:MexpUser|null, me:string, ty:string) => {
     if (!user) return new Response("");
     if (!shared.isScreenOn) return new Response("");
+
+    const extra = (gameConfig.version < 37 ? 'theater/' : (ty == '' ? 'theater/' : `${ty}/`))
     
-    const path = await getRandomFilePath("./assets/videos/");
+    const path = await getRandomFilePath(`./assets/videos/${extra}`);
     
     serverConsoleLog(`${me}`);
     serverConsoleLog(`sending ${path}`);
 
     sharedEvents.emit(EventType.VideoRequested, user, path);
     
-    return new Response(await Deno.readFile(`./assets/videos/${path}`), {
+    return new Response(await Deno.readFile(`./assets/videos/${extra}${path}`), {
         status: 200,
         headers: {
             "content-type": "video/mp4; charset=binary",

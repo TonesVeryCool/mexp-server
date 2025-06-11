@@ -68,7 +68,7 @@ export async function doRouting(info:RoutingInfo) {
       return await m_im(user, me);
     }
     case "/m/m/tv": {
-      return await m_tv(user, me);
+      return await m_tv(user, me, req.headers.get("ty") ?? '');
     }
   }
 }

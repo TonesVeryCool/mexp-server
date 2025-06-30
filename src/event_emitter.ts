@@ -12,7 +12,8 @@ export enum EventType {
     ImageRequested,          // (MexpUser user, string filename)
     VideoRequested,          // (MexpUser user, string filename)
     UnknownCustomPacket,     // (MexpUser user, string packet, string variables)
-    
+    FinishedParkour,         // (MexpUser user)
+
 }
 
 export class EventEmitter {

@@ -244,6 +244,11 @@ export const m_cp = (req:Request, user:MexpUser|null, me:string) => {
         } else {
             serverLog(`${shortenName(me)} turned the screen ${shared.isScreenOn ? "on" : "off"}.`, false);
         }
+    } else if (pa == "cp" && gameConfig.version == 37) { // :fearful:
+        if (gameConfig.validateMaps && user.ghost.scene != "map_parkour") return new Response("");
+        
+        sharedEvents.emit(EventType.FinishedParkour, user);
+        serverLog(`${shortenName(me)} completed the parkour.`, false);
     } else {
         sharedEvents.emit(EventType.UnknownCustomPacket, user, pa, va)
     }

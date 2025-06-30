@@ -58,8 +58,8 @@ export const tokenMapping: Record<string, string> = {
     'museum': 'map_theater',
     'museumexit': 'map_museum_part3',
     'underground_part1': 'map_museum_part4',
-    'underground_part2': 'map_ballpit_alt',
-    'corporation': 'map_test5' // just a guess
+    'underground_part2': 'map_parkour',
+    'corporation': 'map_ballpit_alt'
 };
 
 export const mapTokens: Record<string, string> = {

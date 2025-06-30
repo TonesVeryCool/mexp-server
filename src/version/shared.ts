@@ -317,7 +317,7 @@ export const m_st = (req:Request, user:MexpUser|null, session:MexpSession|null, 
     }
     
     try {
-        if ((tokenMapping[tk] != map || (tk == "underground_part2" && !session.legitBallpitAlt)) && gameConfig.validateTokens && !au) {
+        if ((tokenMapping[tk] != map || (tk == "corporation" && !session.legitBallpitAlt)) && gameConfig.validateTokens && !au) {
             sharedEvents.emit(EventType.TokenObtained, user, false, tk);
 
             user.cheatTokens += ` ${tk}`;

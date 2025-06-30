@@ -133,6 +133,11 @@ export const m_gm = async (req:Request, user:MexpUser|null, session:MexpSession|
     if (map == "map_void_white" && user.lastSpawnData.split(" ")[0] != "map_void_white") {
         map = "map_hell"
     }
+
+    // no idea if this is accurate but i'm pretty sure it is
+    if (map == "map_ballpit_alt" && user.lastSpawnData.split(" ")[0] != "map_cave") {
+        map = "map_hell"
+    }
     
     if (map == "map_maze") {
         if (gameConfig.version > 24) {

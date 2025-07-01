@@ -139,6 +139,16 @@ export async function doRouting(info:RoutingInfo) {
       serverConsoleLog(`sending ads/${id}`);
       
       if (id.includes("..")) return new Response("");
+
+      try {
+        await Deno.lstat(`./assets/ads/${id}`)
+      } catch (err) {
+        if (!(err instanceof Deno.errors.NotFound)) {
+          throw err;
+        }
+        
+        return new Response("0");
+      }
       
       return new Response(await Deno.readFile(`./assets/ads/${id}`), {
         status: 200,

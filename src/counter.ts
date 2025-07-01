@@ -1,5 +1,24 @@
 import { createCanvas } from "https://raw.githubusercontent.com/DjDeveloperr/deno-canvas/master/mod.ts";
 
+async function getCounterDateImage() {
+    const scale = 20;
+    const fontSize = 20 * scale;
+
+    const canvas = createCanvas(240 * scale, 80 * scale);
+    const ctx = canvas.getContext("2d");
+    
+    canvas.loadFont(await Deno.readFile("./assets/fonts/arial.ttf"), { family: 'Arial Regular' });
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = `${fontSize}px Arial Regular`;
+    
+    ctx.fillStyle = `#ffffff`;
+    const dateText = "Counter begins 18/01/24"
+    ctx.fillText(dateText, 8 * scale, 22 * scale);
+
+    return canvas;
+}
+
 export async function getCounter() {
     const canvas = createCanvas(240, 80);
     const ctx = canvas.getContext("2d");
@@ -17,14 +36,13 @@ export async function getCounter() {
     oddGradient.addColorStop(0, "#300040");
     oddGradient.addColorStop(1, "#600080");
 
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.font = "20px Arial Regular";
     ctx.imageSmoothingEnabled = false;
 
-    ctx.fillStyle = `#ffffff`;
-    const dateText = "Counter begins 18/01/24"
-    ctx.fillText(dateText, 8, 22);
+    const date = await getCounterDateImage();
+    ctx.drawImage(date,
+        0, 0, date.width, date.height,
+        0, 0, canvas.width, canvas.height
+    );
 
     ctx.imageSmoothingEnabled = true;
     ctx.textAlign = "center";

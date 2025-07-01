@@ -17,7 +17,7 @@ export const gameConfig = {
     'allTokens': [
         'cave', 'ballpit', 'station', 'station_disco', 'employee',
         'vip', 'theater', 'museum', 'museumexit', 'underground_part1',
-        'underground_part2', 'corporation'
+        'underground_part2', 'corporation', 'basement'
     ],
     'ballpitAltChance': 2 // percentage
 }

@@ -77,6 +77,7 @@ export const mapTokens: Record<string, string> = {
     
     'map_ballpit': 'ballpit',
     'map_ballpit_cave': 'cave',
+    'map_ballpit_alt': '',
     'map_cave': 'cave',
     'map_vip': 'vip',
 

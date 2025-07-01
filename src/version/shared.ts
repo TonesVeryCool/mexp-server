@@ -120,7 +120,7 @@ export const m_gm = async (req:Request, user:MexpUser|null, session:MexpSession|
         serverConsoleLog(`sending to void because: ${err.message}`);
     }
     
-    if (map == "map_ballpit_cave" && randf_range(0.0, 100.0) >= (100 - (gameConfig.ballpitAltChance ?? 2))) {
+    if ((map == "map_ballpit_cave" || map == "map_ballpit") && randf_range(0.0, 100.0) >= (100 - (gameConfig.ballpitAltChance ?? 2))) {
         session.legitBallpitAlt = true;
         map = "map_ballpit_alt";
     }
@@ -135,8 +135,14 @@ export const m_gm = async (req:Request, user:MexpUser|null, session:MexpSession|
     }
 
     // no idea if this is accurate but i'm pretty sure it is
-    if (map == "map_ballpit_alt" && user.lastSpawnData.split(" ")[0] != "map_cave") {
-        map = "map_hell"
+    if (map == "map_ballpit_alt") {
+        const ghostMap = user.ghost.scene;
+        const ghostPos = user.ghost.position;
+
+        if (ghostMap != "map_void" && ghostMap != "map_hell" && ghostMap != "map_house" && !(ghostMap == "map_cave" && ghostPos.x > 24.0) && !session.legitBallpitAlt)
+        {
+            map = "map_hell"
+        }
     }
     
     if (map == "map_maze") {
@@ -247,7 +253,7 @@ export const m_cp = (req:Request, user:MexpUser|null, me:string) => {
         } else {
             serverLog(`${shortenName(me)} turned the screen ${shared.isScreenOn ? "on" : "off"}.`, false);
         }
-    } else if (pa == "cp" && gameConfig.version == 37) { // :fearful:
+    } else if (pa == "cp" && gameConfig.version >= 37) { // :fearful:
         if (gameConfig.validateMaps && user.ghost.scene != "map_parkour") return new Response("");
         
         sharedEvents.emit(EventType.FinishedParkour, user);

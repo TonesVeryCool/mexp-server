@@ -29,7 +29,7 @@ export const speakConfig = {
 }
 
 // if using a reverse proxy that has https, this is useless
-// only use this if you **want** it to only be accessible with http
+// only use this if you **want** it to only be accessible with https
 export const httpsConfig = {
     'fullchain': '', // path to fullchain.pem
     'privkey': '', // path to privkey.pem

@@ -211,6 +211,7 @@ export const m_sg = (req:Request, user:MexpUser|null, me:string) => {
             return new Response();
         }
 
+        user.ghost.scene = user.lastSpawnData.split(" ")[0];
         user.ghost.position = MexpPosition.fromString(spawnData);
         user.lastPlayed = now();
         

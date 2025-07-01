@@ -133,7 +133,7 @@ export async function doRouting(info:RoutingInfo) {
       if (id == "0") {
         const paths:string[] = await getAllPaths("./assets/ads/");
         
-        return new Response(paths.join(";"));
+        return new Response(paths.join("\n"));
       }
       
       serverConsoleLog(`sending ads/${id}`);

@@ -151,14 +151,11 @@ export const m_gm = async (req:Request, user:MexpUser|null, session:MexpSession|
         spawnData = "0 0.9 0 0";
     }
     
-    user.ghost.scene = map;
-    user.ghost.position = MexpPosition.fromString(spawnData);
     user.lastSpawnData = `${map} ${spawnData}`;
 
-    sharedEvents.emit(EventType.MapLoaded, user, map, user.ghost.position);
+    sharedEvents.emit(EventType.MapLoaded, user, map, MexpPosition.fromString(spawnData));
 
     user.commit();
-    user.ghost.commit();
     
     serverConsoleLog(`${me} ${map}`);
     

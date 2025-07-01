@@ -54,6 +54,7 @@ export const tokenMapping: Record<string, string> = {
     'station_disco': 'map_ballpit',
     'employee': 'map_maze',
     'vip': 'map_maze',
+    'basement': 'map_maze',
     'theater': 'map_vip',
     'museum': 'map_theater',
     'museumexit': 'map_museum_part3',
@@ -99,8 +100,8 @@ export const mapTokens: Record<string, string> = {
     'map_corporation_part16': 'corporation',
     'map_corporation_part17': 'corporation',
     'map_corporation_part18': 'corporation',
-    'map_corporation_part19': 'corporation',
-    'map_corporation_part20': 'corporation',
+    'map_corporation_part19': 'basement',
+    'map_corporation_part20': 'basement',
 
     'map_underground_part1': 'underground_part1',
     'map_underground_part2': 'underground_part2',

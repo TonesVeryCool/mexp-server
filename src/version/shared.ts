@@ -388,6 +388,16 @@ export const m_tv = async (user:MexpUser|null, me:string, ty:string) => {
 
     sharedEvents.emit(EventType.VideoRequested, user, path);
     
+    try {
+        await Deno.lstat(`./assets/videos/${extra}${path}`)
+    } catch (err) {
+        if (!(err instanceof Deno.errors.NotFound)) {
+            throw err;
+        }
+
+        return new Response('Unexpectedly, a crisis.')
+    }
+
     return new Response(await Deno.readFile(`./assets/videos/${extra}${path}`), {
         status: 200,
         headers: {

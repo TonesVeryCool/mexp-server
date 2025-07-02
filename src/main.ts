@@ -10,9 +10,11 @@ import { pluginManager } from "./shared.ts";
 import { getCounter } from "./counter.ts";
 
 if (import.meta.main) {
-  console.log("loading plugins...")
+  if (serverConfig.allowPlugins) {
+    console.log("loading plugins...")
 
-  await pluginManager.loadPlugins();
+    await pluginManager.loadPlugins();
+  }
 
   const usesHttps = (httpsConfig.fullchain && httpsConfig.privkey);
   const settings = usesHttps ?
@@ -102,5 +104,7 @@ if (import.meta.main) {
     return new Response("404");
   });
 
-  terminalApp();
+  if (serverConfig.allowTerminalCommands) {
+    terminalApp();
+  }
 }

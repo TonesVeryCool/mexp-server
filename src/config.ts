@@ -4,7 +4,10 @@ export const serverConfig = {
     'port': 19968,
     'redirectUrl': '', // if this is set to anything, /anymozu5/me/main/host responds with this instead of the automatic one
     'data': 'mexp',
-    'extraLogging': true // at the cost of inaccuracy, have more logs
+    'extraLogging': true, // at the cost of inaccuracy, have more logs
+    'allowPlugins': false,
+    'allowTerminalCommands': false,
+
 }
 
 export const gameConfig = {

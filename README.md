@@ -12,6 +12,7 @@ MineXplorer server recreation written with Deno
 - [ ] special bans (force hell/force void) (was this ever used outside of `tutwh` anyway?)
 - [x] game downloads (`/version/mexp`)
 - [x] test versions below v35
+- [ ] find the _editor spawn map (is it even possible?)
 
 # Inaccuracies
 - Speak has some inaccuracies with word mixing
@@ -21,6 +22,8 @@ MineXplorer server recreation written with Deno
 - `map_ballpit_alt` requirements are not 100% accurate
 - The map switch timers might be inaccurate
 - Captcha expiry times might not be 100% accurate
+- The /counter implementation is nowhere close to accurate
+- _editor does not spawn in the correct map (see todo above)
 
 # Version Compatibility
 * `Guaranteed not working`: This version doesn't work with the server recreation.

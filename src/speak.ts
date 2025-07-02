@@ -21,7 +21,7 @@ export async function indexesToText(str:string[]) {
             const idxNumber = Number.parseInt(idxString);
 
             if (idxNumber >= wordListSplit.length) {
-                final += "undefined ";
+                final += " undefined";
                 lastWord = "undefined";
             } else if (idxNumber < 0) {
                 final += " ";

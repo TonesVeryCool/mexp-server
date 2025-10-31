@@ -44,30 +44,30 @@ MineXplorer server recreation written with Deno
 | 8              | Guaranteed not working    |
 | 9              | Guaranteed not working    |
 | 10             | Guaranteed not working    |
-| 11             | Guaranteed not working    |
-| 12             | Guaranteed not working    |
-| 13             | Guaranteed not working    |
-| 14             | Guaranteed not working    |
-| 15             | Guaranteed not working    |
-| 16             | Guaranteed not working    |
-| 17             | Guaranteed not working    |
-| 18             | Guaranteed not working    |
-| 19             | Guaranteed not working    |
-| 20             | Guaranteed not working    |
-| 21             | Guaranteed not working    |
-| 22             | Guaranteed not working    |
-| 23             | Guaranteed not working    |
-| 24             | Guaranteed not working    |
-| 25             | Guaranteed not working    |
-| 26             | Guaranteed not working    |
+| 11             | Guaranteed working        |
+| 12             | Guaranteed working        |
+| 13             | Guaranteed working        |
+| 14             | Guaranteed working        |
+| 15             | Guaranteed working        |
+| 16             | Guaranteed working        |
+| 17             | Guaranteed working        |
+| 18             | Guaranteed working        |
+| 19             | Guaranteed working        |
+| 20             | Guaranteed working        |
+| 21             | Guaranteed working        |
+| 22             | Guaranteed working        |
+| 23             | Guaranteed working        |
+| 24             | Guaranteed working        |
+| 25             | Guaranteed working        |
+| 26             | Guaranteed working        |
 | 27             | Guaranteed working        |
 | 28             | Guaranteed working        |
 | 29             | Guaranteed working        |
 | 30             | Guaranteed working        |
 | 31             | Guaranteed working        |
 | 32             | Guaranteed working        |
-| 33             | Might work, not confirmed |
-| 34             | Might work, not confirmed |
+| 33             | Guaranteed working        |
+| 34             | Guaranteed working        |
 | 35             | Guaranteed working        |
 | 36             | Guaranteed working        |
 | 37             | Guaranteed working        |

@@ -9,7 +9,7 @@ export const chatMessages:SpeakMessage[] = []
 
 export async function indexesToText(str:string[]) {
     let final:string = "";
-    const wordList = await Deno.readTextFile("./assets/wordlist.txt");
+    const wordList = await Deno.readTextFile(gameConfig.version < 20 ? "./assets/wordlist_pre20.txt" : "./assets/wordlist.txt");
     const wordListSplit = wordList.split(" ");
 
     let lastWord = "";

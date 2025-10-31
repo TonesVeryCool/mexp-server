@@ -4,7 +4,7 @@ import { EventType } from "../event_emitter.ts";
 import { shared, sharedEvents } from "../shared.ts";
 import { chatMessages, indexesToText, SpeakMessage } from "../speak.ts";
 import { hasSession, MexpGhost, MexpPosition, MexpSession, MexpUser, sessions } from "../user.ts";
-import { getRandomFilePath, hasAllTokens, mixingForMap, now, randf_range, serverConsoleLog, serverLog, shortenName, validateUsername } from "../utils.ts";
+import { getRandomFilePath, hasAllTokens, mixingForMap, now, randf_range, serverConsoleLog, serverLog, shortenName, validateUsername, timeSinceLastOnline } from "../utils.ts";
 
 export const version_mexp = async () => {
     return new Response(await Deno.readFile(`./assets/latest.7z`), {
@@ -35,27 +35,7 @@ export const m_dl = () => {
     return new Response(serverConfig.data);
 }
 
-export const m_vi = (req:Request, me:string, au:boolean) => {
-    const vs = req.headers.get("vs") ?? "0";
-    if (!validateUsername(me, au)) {
-        return new Response("0");
-    }
-    
-    if (vs != gameConfig.version.toString()) {
-        return new Response("");
-    }
-
-    if (!gameConfig.allowed) return new Response();
-
-    let accountsAllowed = true;
-
-    if (gameConfig.version >= 36 && !au) accountsAllowed = false;
-    if (!gameConfig.accountCreation) accountsAllowed = false;
-    
-    const player:MexpUser|null = getPlayer(me, !accountsAllowed, false);
-    if (!player) return new Response("");
-    if (player.banned) return new Response("0");
-    
+const createSession = (player:MexpUser|null, me:string) => {
     player.lastPlayed = now();
     player.commit();
     
@@ -73,18 +53,58 @@ export const m_vi = (req:Request, me:string, au:boolean) => {
         
         sessions.push(session);
     }
+}
+
+export const m_vi = (req:Request, me:string, au:boolean) => {
+    const vs = req.headers.get("vs") ?? "0";
+    
+    if (!validateUsername(me, au)) {
+        return new Response("0");
+    }
+    
+    if (gameConfig.version >= 24 && vs != gameConfig.version.toString()) {
+        return new Response("");
+    }
+
+    if (!gameConfig.allowed) return new Response();
+
+    let accountsAllowed = true;
+
+    if (gameConfig.version >= 36 && !au) accountsAllowed = false;
+    if (!gameConfig.accountCreation) accountsAllowed = false;
+    
+    const player:MexpUser|null = getPlayer(me, !accountsAllowed, false);
+    if (!player) return new Response("");
+    if (player.banned) return new Response("0");
+    
+    createSession(player, me);
     
     return new Response("1");
 }
 
-export const m_gt = (user:MexpUser|null) => {
-    if (!user) return new Response("");
+export const m_gt = (user:MexpUser|null, me:string|null) => {
+    if (gameConfig.version >= 22 && !user) return new Response("");
+
+    // version 21 and below do not have verification and gets passed through /gt
+    if (gameConfig.version <= 21) {
+        user = getPlayer(me, false, false);
+        if (!user) return new Response("");
+        if (user.banned) return new Response("");
+
+        createSession(user, me);
+    }
+
     return new Response(`${user.legitTokens} ${user.cheatTokens}`);
+}
+
+export const m_sm = (user:MexpUser|null) => {
+    if (!user) return new Response("");
+    return new Response(`${user.lastSpawnData.split(" ")[0]}`);
 }
 
 export const m_sd = (user:MexpUser|null) => {
     if (!user) return new Response("");
-    return new Response(`${user.lastSpawnData}`);
+    return new Response(gameConfig.version <= 21 ? `${user.lastSpawnData.split(" ").slice(1).join(" ")}` : `${user.lastSpawnData}`);
 }
 
 export const m_wl = async (user:MexpUser|null) => {
@@ -109,7 +129,7 @@ export const m_gm = async (req:Request, user:MexpUser|null, session:MexpSession|
         if (!hasAllTokens(map, tokens) && gameConfig.validateMaps && !au) {
             if (user.lastSpawnData != `${map} ${spawnData}`) throw new Deno.errors.NotFound("Was the map found? I don't know, the user doesn't have access to it!");
         }
-        await Deno.lstat(`./assets/maps/${map}`)
+        await Deno.lstat(`./assets/maps/${gameConfig.version >= 20 ? gameConfig.version >= 24 ? "2022" : "2019" : "2018"}/${map}`)
     } catch (err) {
         if (!(err instanceof Deno.errors.NotFound)) {
             throw err;
@@ -165,7 +185,7 @@ export const m_gm = async (req:Request, user:MexpUser|null, session:MexpSession|
     
     serverConsoleLog(`${me} ${map}`);
     
-    return new Response(await Deno.readFile(`./assets/maps/${map}`), {
+    return new Response(await Deno.readFile(`./assets/maps/${gameConfig.version >= 20 ? gameConfig.version >= 24 ? "2022" : "2019" : "2018"}/${map}`), {
         status: 200,
         headers: {
             "content-type": "application/octet-stream; charset=binary",
@@ -207,6 +227,28 @@ export const m_gn = async (user:MexpUser|null) => {
     return new Response(await Deno.readTextFile("./assets/news.txt"));
 }
 
+export const m_gp = (req:Request, user:MexpUser|null, me:string) => {
+    if (!user) return new Response("");
+    const target = req.headers.get("pr") ?? shortenName(me);
+    
+    const targetUser = getPlayer(target, true, false);
+    if (!targetUser) return new Response("\n\nundefined\nundefined");
+    
+    if (target == "_edit") {
+        return new Response(`_edit\nDon't mess with it.\nalways\nall`);
+    }
+    
+    const speakMsg = targetUser.ghost.speak.replace("@", " ").trim();
+    const finalMsg = speakMsg == "" ? `` : `'${speakMsg}'`;
+    
+    const lastOnline = now() - targetUser.lastPlayed;
+    
+    const tokensSplit = targetUser.legitTokens.split(" ").join(", ")
+    const tokens = gameConfig.version > 29 ? tokensSplit.length == 0 ? "(none)" : tokensSplit : tokensSplit.length;
+    
+    return new Response(`${target}\n${finalMsg}\n${timeSinceLastOnline(lastOnline)}\n${tokens}`);
+}
+
 export const m_sg = (req:Request, user:MexpUser|null, me:string) => {
     if (!user) return new Response("");
     
@@ -230,7 +272,7 @@ export const m_sg = (req:Request, user:MexpUser|null, me:string) => {
         serverConsoleLog(`${spawnData}`);
     }
     
-    return new Response(gameConfig.version < 35 ? "check" : "1");
+    return new Response(gameConfig.version < 34 ? "check" : "1");
 }
 
 export const m_pc = (user:MexpUser|null) => {
@@ -278,7 +320,7 @@ export const m_gs = (user:MexpUser|null) => {
     
     final = final.substring(0, final.length - 1);
     
-    return new Response(final);
+    return new Response(final == "" ? " " : final);
 }
 
 export const m_ss = async (req:Request, user:MexpUser|null) => {
@@ -319,7 +361,8 @@ export const m_st = (req:Request, user:MexpUser|null, session:MexpSession|null, 
     if (!session) return new Response("");
     
     const tk = req.headers.get("tk") ?? "cave";
-    const map = user.ghost.scene;
+    //const map = user.ghost.scene;
+    const map = user.lastSpawnData.split(" ")[0];
     
     if (!gameConfig.allTokens.includes(tk)) {
         return new Response("");

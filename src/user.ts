@@ -176,7 +176,11 @@ export class MexpGhost {
     }
 
     public str(): string {
-        return `${this.position.str()} ${MexpGhost.typeToStr(this.type)} ${this.name} ${this.speak}`
+        if (gameConfig.version <= 19) {
+            return `${this.position.str()} ${this.type == GhostType.Authorized ? "1" : "0"} ${this.name} ${this.speak}`;
+        } else {
+            return `${this.position.str()} ${MexpGhost.typeToStr(this.type)} ${this.name} ${this.speak}`;
+        }
     }
 
     public commit() {

@@ -1,8 +1,9 @@
 import { encode, isAuthorized, RoutingInfo, validateUsername } from "./utils.ts";
 import { serverConfig, gameConfig, httpsConfig } from "./config.ts";
-import { doRouting as post29Router } from "./version/post29.ts";
+import { doRouting as post28Router } from "./version/post28.ts";
 import { doRouting as v28Router } from "./version/28.ts";
 import { doRouting as pre28Router } from "./version/pre28.ts";
+import { doRouting as pre25Router } from "./version/pre25.ts";
 import { getSession, MexpSession, MexpUser } from "./user.ts";
 import { version_mexp } from "./version/shared.ts";
 import { terminalApp } from "./term.ts";
@@ -10,6 +11,8 @@ import { pluginManager } from "./shared.ts";
 import { getCounter } from "./counter.ts";
 
 if (import.meta.main) {
+  console.log(`Acting as version ${gameConfig.version}`);
+
   if (serverConfig.allowPlugins) {
     console.log("loading plugins...")
 
@@ -43,7 +46,24 @@ if (import.meta.main) {
     let user:MexpUser|null = null;
     let au:boolean = false;
     
-    if (me != "" && path != (gameConfig.version == 28 ? "/m/u/vi" : gameConfig.version < 28 ? "/m/vi" : "/m/u/v") && !(gameConfig.version >= 36 && me == "none" && (path == "/m/m/c" || path == "/m/u/c"))) {
+    let authPath:string = "/m/u/v";
+
+    if (gameConfig.version == 28) {
+      authPath = "/m/u/vi";
+    } else if (gameConfig.version < 28) {
+      authPath = "/m/vi";
+
+      if (gameConfig.version <= 21) {
+        authPath = "/gt";
+      } else if (gameConfig.version <= 24) {
+        authPath = "/vi";
+      }
+    }
+
+    const isOnGameEndpoint:boolean = (me != "" && path != authPath);
+    const isOnAuthEndpoint:boolean = (gameConfig.version >= 36 && me == "none" && (path == "/m/m/c" || path == "/m/u/c"));
+
+    if (isOnGameEndpoint && !isOnAuthEndpoint) {
       session = getSession(me);
       if (!session) {
         if (serverConfig.extraLogging) console.log(`Session for user ${me} doesn't exist!`);
@@ -84,7 +104,7 @@ if (import.meta.main) {
     }
 
     if (gameConfig.version >= 29) {
-      const response = await post29Router(routingInfo);
+      const response = await post28Router(routingInfo);
       if (response) return response;
     }
 
@@ -93,8 +113,13 @@ if (import.meta.main) {
       if (response) return response;
     }
 
-    if (gameConfig.version < 28) {
+    if (gameConfig.version >= 25) {
       const response = await pre28Router(routingInfo);
+      if (response) return response;
+    }
+
+    if (gameConfig.version <= 24) {
+      const response = await pre25Router(routingInfo);
       if (response) return response;
     }
     

@@ -1,9 +1,9 @@
-import { getAllPaths, now, randomLetters, RoutingInfo, serverConsoleLog, serverLog, shortenName, timeSinceLastOnline } from "../utils.ts";
+import { getAllPaths, now, randomLetters, RoutingInfo, serverConsoleLog, serverLog, shortenName } from "../utils.ts";
 import { getPlayer } from "../db.ts";
 import { serverConfig, gameConfig } from "../config.ts";
 import { MexpSession, MexpUser } from "../user.ts";
 import { Captcha, captchas } from "../captcha.ts";
-import { mexp_allowed, mexp_version, m_ga, m_dl, m_gg, m_gm, m_gt, m_sd, m_vi, m_wl, m_gn, m_sg, m_pc, m_cp, m_gs, m_ss, m_st, m_im, m_tv } from "./shared.ts";
+import { mexp_allowed, mexp_version, m_ga, m_dl, m_gg, m_gm, m_gt, m_sd, m_vi, m_wl, m_gn, m_sg, m_pc, m_cp, m_gp, m_gs, m_ss, m_st, m_im, m_tv } from "./shared.ts";
 
 export async function doRouting(info:RoutingInfo) {
   const req:Request = info.req;
@@ -86,25 +86,7 @@ export async function doRouting(info:RoutingInfo) {
       return await m_gn(user);
     }
     case "/m/u/p": {
-      if (!user) return new Response("");
-      const target = req.headers.get("pr") ?? shortenName(me);
-      
-      const targetUser = getPlayer(target, true, false);
-      if (!targetUser) return new Response("\n\nundefined\nundefined");
-      
-      if (target == "_edit") {
-        return new Response(`_edit\nDon't mess with it.\nalways\nall`);
-      }
-      
-      const speakMsg = targetUser.ghost.speak.replace("@", " ").trim();
-      const finalMsg = speakMsg == "" ? `` : `'${speakMsg}'`;
-      
-      const lastOnline = now() - targetUser.lastPlayed;
-      
-      const tokensSplit = targetUser.legitTokens.split(" ").join(", ")
-      const tokens = gameConfig.version > 29 ? tokensSplit.length == 0 ? "(none)" : tokensSplit : tokensSplit.length;
-      
-      return new Response(`${target}\n${finalMsg}\n${timeSinceLastOnline(lastOnline)}\n${tokens}`);
+      return m_gp(req, user, me);
     }
     case "/m/u/g": {
       return m_sg(req, user, me);
